@@ -11,8 +11,8 @@ const seedUsers = [
   { email: "andre@maviblue.com", name: "Andre", isEditor: false },
   { email: "ozlemonat@hotmail.com", name: "Özlem", isEditor: false },
   { email: "ari.tatonyan@gmail.com", name: "Ari", isEditor: false },
-  { email: "dani@example.com", name: "Dani", isEditor: false },
-  { email: "robin@example.com", name: "Robin", isEditor: false },
+  { email: "chop.reilly@gmail.com", name: "Chris", isEditor: false },
+  { email: "gulumser.cicek@gmail.com", name: "Gülümser", isEditor: false },
 ];
 
 async function main() {
