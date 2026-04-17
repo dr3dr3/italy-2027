@@ -18,7 +18,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Italia 2027",
-  description: "Six friends, one trip.",
+  description: "A few friends, one trip.",
 };
 
 export default function RootLayout({
