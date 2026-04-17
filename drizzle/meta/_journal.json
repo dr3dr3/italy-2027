@@ -29,6 +29,13 @@
       "when": 1776294288526,
       "tag": "0003_remarkable_magma",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1776417220896,
+      "tag": "0004_greedy_star_brand",
+      "breakpoints": true
     }
   ]
 }

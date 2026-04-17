@@ -12,8 +12,19 @@ import { OverviewMapLoader } from "@/components/map/overview-map-loader";
 import type { OverviewItinerary } from "@/components/map/overview-map";
 import { ItineraryStatusControl } from "@/components/itineraries/itinerary-status-control";
 import { ArchivedToggle } from "@/components/itineraries/archived-toggle";
+import { ActiveUsers } from "@/components/presence/active-users";
+import { getActivePresence } from "@/lib/queries/users";
 
-const OVERVIEW_COLOURS = ["#c65d3a", "#6b7a3f", "#7a2e2e", "#1a1a1a"] as const;
+// Per-itinerary styling. Colour + dash pattern differ together so colour-blind
+// viewers have two redundant encodings. Labels (A/B/…) land on the pins and
+// legend for a third.
+const OVERVIEW_STYLES = [
+  { colour: "#c65d3a", dashArray: "6 8" as string | undefined },
+  { colour: "#6b7a3f", dashArray: "2 6" as string | undefined },
+  { colour: "#7a2e2e", dashArray: "12 6" as string | undefined },
+  { colour: "#1a1a1a", dashArray: undefined as string | undefined },
+] as const;
+const LABELS = ["A", "B", "C", "D"] as const;
 
 async function handleSignOut() {
   "use server";
@@ -32,6 +43,8 @@ async function loadOverviewItineraries(): Promise<OverviewItinerary[]> {
         slug: r.itinerarySlug,
         title: r.itineraryTitle,
         colour: "",
+        label: "",
+        dashArray: undefined,
         stops: [],
       };
       byId.set(r.itineraryId, it);
@@ -45,10 +58,13 @@ async function loadOverviewItineraries(): Promise<OverviewItinerary[]> {
       lng: Number(r.lng),
     });
   }
-  // Stable colour assignment by itinerary id asc.
+  // Stable style assignment by itinerary id asc.
   const ordered = [...byId.values()].sort((a, b) => a.id - b.id);
   ordered.forEach((it, i) => {
-    it.colour = OVERVIEW_COLOURS[i] ?? OVERVIEW_COLOURS[OVERVIEW_COLOURS.length - 1];
+    const style = OVERVIEW_STYLES[i] ?? OVERVIEW_STYLES[OVERVIEW_STYLES.length - 1];
+    it.colour = style.colour;
+    it.dashArray = style.dashArray;
+    it.label = LABELS[i] ?? String(i + 1);
   });
   return ordered;
 }
@@ -138,10 +154,11 @@ export default async function Home() {
   const userId = session?.user?.id ? Number(session.user.id) : null;
   const isEditor = Boolean(session?.user?.isEditor);
 
-  const [visible, overview, archived] = await Promise.all([
+  const [visible, overview, archived, presences] = await Promise.all([
     loadItinerariesByStatus(isEditor ? ["draft", "active"] : ["active"]),
     loadOverviewItineraries(),
     isEditor ? loadItinerariesByStatus(["archived"]) : Promise.resolve([]),
+    getActivePresence(),
   ]);
 
   const visibleVoteIds = visible.map((r) => r.id);
@@ -181,6 +198,7 @@ export default async function Home() {
           <p className="mt-2 text-base text-ink/60">
             Le opzioni <span className="text-ink/40">/ the options</span>
           </p>
+          <ActiveUsers presences={presences} currentUserId={userId} />
         </header>
 
         {overview.length > 0 && (
@@ -202,9 +220,11 @@ export default async function Home() {
                     className="inline-flex items-center gap-2 text-sm text-ink/70 hover:text-ink"
                   >
                     <span
-                      className="inline-block h-3 w-3 rounded-full"
+                      className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold text-cream"
                       style={{ backgroundColor: it.colour }}
-                    />
+                    >
+                      {it.label}
+                    </span>
                     {it.title}
                   </Link>
                 </li>

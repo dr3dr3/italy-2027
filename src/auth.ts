@@ -80,6 +80,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: users.id,
           name: users.name,
           isEditor: users.isEditor,
+          lastSeenAt: users.lastSeenAt,
         })
         .from(users)
         .where(eq(users.email, user.email!))
@@ -88,6 +89,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = String(row.id);
         session.user.name = row.name ?? undefined;
         session.user.isEditor = row.isEditor;
+        // Throttle presence touches — avoids slamming the DB on every auth() call.
+        const last = row.lastSeenAt?.getTime() ?? 0;
+        if (Date.now() - last > 60_000) {
+          await db
+            .update(users)
+            .set({ lastSeenAt: new Date() })
+            .where(eq(users.id, row.id));
+        }
       }
       return session;
     },

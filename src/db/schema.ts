@@ -25,6 +25,7 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
+  lastSeenAt: timestamp("last_seen_at", { withTimezone: true, mode: "date" }),
 });
 
 export const accounts = pgTable(

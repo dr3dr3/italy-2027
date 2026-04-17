@@ -28,15 +28,17 @@ export type OverviewItinerary = {
   slug: string;
   title: string;
   colour: string;
+  label: string;
+  dashArray: string | undefined;
   stops: OverviewStop[];
 };
 
-function coloredIcon(colour: string) {
+function labeledIcon(colour: string, label: string) {
   return L.divIcon({
     className: "",
-    iconSize: [14, 14],
-    iconAnchor: [7, 7],
-    html: `<svg width="14" height="14"><circle cx="7" cy="7" r="6" fill="${colour}" stroke="white" stroke-width="1.5"/></svg>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+    html: `<div style="width:20px;height:20px;border-radius:50%;background:${colour};border:1.5px solid #faf7f2;color:#faf7f2;font:600 11px/1 Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,0.35);">${label}</div>`,
   });
 }
 
@@ -81,7 +83,7 @@ export default function OverviewMap({
             (a, b) => a.day - b.day || a.orderInDay - b.orderInDay,
           );
           const line: [number, number][] = ordered.map((s) => [s.lat, s.lng]);
-          const icon = coloredIcon(it.colour);
+          const icon = labeledIcon(it.colour, it.label);
           return (
             <Fragment key={it.id}>
               {line.length > 1 && (
@@ -89,9 +91,9 @@ export default function OverviewMap({
                   positions={line}
                   pathOptions={{
                     color: it.colour,
-                    weight: 2,
-                    opacity: 0.7,
-                    dashArray: "6 8",
+                    weight: 2.5,
+                    opacity: 0.75,
+                    dashArray: it.dashArray,
                   }}
                 />
               )}
