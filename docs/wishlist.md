@@ -23,21 +23,56 @@ Cost: one column, one middleware tweak, one component. Cheap.
 
 ## 3. One video shared across all itineraries with the same stop
 
-Andre confirmed behaviourally that a YouTube link on "Napoli" in itinerary A
-also shows up on "Napoli" in itinerary B. Worth verifying in code — the current
-schema keys videos to `stops.id`, and each itinerary has its own `stops` rows
-after import, so they *shouldn't* share. If they do, something interesting is
-going on (a query joining on name? a UI quirk?). If they don't and Andre saw
-coincidence, the question is whether we *want* them shared and how — by stop
-name, by lat/lng proximity, or via a new `places` table above `stops`.
+**Confirmed (2026-04-17):** Andre added a YouTube link on Napoli in itinerary A
+and it did *not* appear on Napoli in itinerary B. That matches the schema —
+`videos.stop_id` points at a specific `stops.id`, and the importer replaces
+stops wholesale per itinerary, so Napoli-A and Napoli-B are different rows.
+We want them to share.
 
-Implementation sketch if we want it deliberate:
+### The design question, in one line
 
-- Add a `places` table (keyed by some canonical name or geohash). Stops join to
-  a place; videos attach to the place. Itineraries reference stops, not places,
-  so the collaboration layer spans.
-- Not trivial. Would ripple through suggestions and comments too if we wanted
-  those shared as well — which opens a whole design question.
+How do we decide that "Napoli here" and "Napoli there" are the same place?
+
+Three options, cheapest to heaviest:
+
+**A. Match by stop name (text equality).** Query: "give me every video whose
+stop's name equals this stop's name." No schema change. Roughly an afternoon.
+Fragile the moment someone imports "Naples" or "Napoli (old town)" — silent
+miss. Fine as a stopgap, bad as the final answer.
+
+**B. Add a `place_key` column to `stops`.** Denormalised canonical key
+(slugified name, or a rounded lat/lng bucket). Videos stay on `stop_id`; the
+query widens to "all videos whose stop shares this stop's `place_key`." Import
+generates the key. No FK changes, no data migration beyond a backfill.
+~half a day of work, including updating the importer and the three video
+queries in `src/lib/queries/videos.ts`.
+
+**C. Proper `places` table.** `places (id, canonical_name, lat, lng)`,
+`stops.place_id → places.id`, `videos.place_id → places.id` (moves off
+`stop_id`). Most correct. Worst bang-for-buck: schema migration, data
+migration to dedupe existing stops into places, rewrite every video query,
+and we have to decide at the same time whether comments and suggestions
+should also span itineraries (they're polymorphic on `stop`, so the same
+question bites them). Probably a day-plus and lots of churn for six users.
+
+### Recommendation
+
+**Go with B.** It solves the reported problem, doesn't force us to answer the
+comments/suggestions question yet, and is reversible — we can promote to a
+real `places` table later if we ever want to.
+
+### Open questions to answer before building
+
+- Canonical key: slug of `name`, or geohash of lat/lng? Slug is simpler but
+  breaks on "Napoli" vs "Naples". Geohash is robust but opaque. Probably
+  slug + manual override column for the one or two cases that disagree.
+- Do comments and suggestions follow the same rule? If yes, same design again
+  on the polymorphic target. If no, we have to justify why videos are special.
+  Worth asking the group.
+- Delete semantics: if Napoli-A is removed from an itinerary, does a video
+  Andre attached there vanish everywhere, or survive on Napoli-B? Option B
+  with `on delete cascade` on `stop_id` means it vanishes. Probably fine; flag
+  it so no one's surprised.
 
 ## 4. Managing multiple itineraries and their status
 

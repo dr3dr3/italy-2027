@@ -37,6 +37,7 @@ Normalised from `source_json` on import.
 | day           | int          | 1-indexed day number                 |
 | order_in_day  | int          | Sort order within a day              |
 | name          | text         | e.g. "Firenze"                       |
+| place_key     | text         | `slugify(name)`. Links same-place stops across itineraries (videos span this). Unique within an itinerary. |
 | description   | text         | Optional blurb                       |
 | lat           | numeric      | For map pin                          |
 | lng           | numeric      | For map pin                          |
@@ -87,14 +88,20 @@ Group wishlist for things to do at each stop.
 ### `videos`
 YouTube links shared against a stop. Store URL, render embed.
 
-| Column       | Type         | Notes                     |
-|--------------|--------------|---------------------------|
-| id           | bigserial PK |                           |
-| stop_id      | bigint FK    |                           |
-| user_id      | bigint FK    |                           |
-| youtube_url  | text         |                           |
-| note         | text         | Optional one-liner        |
-| created_at   | timestamptz  |                           |
+| Column       | Type         | Notes                                                |
+|--------------|--------------|------------------------------------------------------|
+| id           | bigserial PK |                                                      |
+| stop_id      | bigint FK    | Attached to one stop, on delete cascade              |
+| user_id      | bigint FK    |                                                      |
+| youtube_url  | text         |                                                      |
+| note         | text         | Optional one-liner                                    |
+| created_at   | timestamptz  |                                                      |
+
+Videos are visible on every stop sharing the attached stop's `place_key`, so a
+clip posted on Napoli in itinerary A shows up on Napoli in itinerary B. The
+video itself still lives as one row attached to one stop — if that stop is
+deleted (including via re-import removing the place), the video goes with it.
+Comments and suggestions stay per-stop; only videos span.
 
 ## Import flow
 
@@ -102,6 +109,12 @@ YouTube links shared against a stop. Store URL, render embed.
 2. Run it through Claude → produces JSON matching the `source_json` shape
 3. Commit JSON to `data/itineraries/<slug>.json`
 4. Hit `/admin/import` (editor-gated) → upserts into `itineraries` + `stops`
+
+Re-imports merge stops by `place_key`: existing stops with a matching key are
+updated in place (preserving attached videos), new keys are inserted, and stops
+whose `place_key` no longer appears in the incoming JSON are deleted (their
+videos cascade-delete). A duplicate `place_key` within one itinerary is
+rejected at import time.
 
 JSON shape:
 

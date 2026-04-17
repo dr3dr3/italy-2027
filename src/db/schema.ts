@@ -90,13 +90,17 @@ export const stops = pgTable(
     day: integer("day").notNull(),
     orderInDay: integer("order_in_day").notNull(),
     name: text("name").notNull(),
+    placeKey: text("place_key").notNull(),
     description: text("description"),
     lat: numeric("lat"),
     lng: numeric("lng"),
     arriveDate: date("arrive_date"),
     departDate: date("depart_date"),
   },
-  (t) => [index("stops_itinerary_id_idx").on(t.itineraryId)],
+  (t) => [
+    index("stops_itinerary_id_idx").on(t.itineraryId),
+    index("stops_place_key_idx").on(t.placeKey),
+  ],
 );
 
 export const comments = pgTable(

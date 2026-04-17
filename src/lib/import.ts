@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db, itineraries, stops } from "@/db";
 
 const STATUSES = ["draft", "active", "archived"] as const;
@@ -74,10 +74,10 @@ function validateShape(raw: unknown): { ok: true; json: ItineraryJson } | { ok: 
 }
 
 /**
- * Upsert an itinerary + its stops by slug. Replaces stops wholesale for an
- * existing itinerary (same semantics as the CLI importer). No auth — wrap
- * this in the server action (web UI) or CLI (file reader) to add
- * permissioning.
+ * Upsert an itinerary + its stops by slug. Stops are merged by place_key
+ * within the itinerary: existing stops with a matching key are updated in
+ * place (preserving attached videos); new keys are inserted; orphaned stops
+ * are deleted (cascade-removing their videos).
  */
 export async function importItineraryFromJson(raw: unknown): Promise<ImportResult> {
   const check = validateShape(raw);
@@ -87,6 +87,18 @@ export async function importItineraryFromJson(raw: unknown): Promise<ImportResul
   const slug = json.slug?.trim() || slugify(json.title);
   if (slug.length === 0) {
     return { ok: false, error: "Could not derive a slug from the title." };
+  }
+
+  const incoming = json.stops.map((s) => ({ ...s, placeKey: slugify(s.name) }));
+  const seenKeys = new Set<string>();
+  for (const s of incoming) {
+    if (seenKeys.has(s.placeKey)) {
+      return {
+        ok: false,
+        error: `Duplicate place_key "${s.placeKey}" within this itinerary (from stop "${s.name}"). Each place can only appear once per itinerary.`,
+      };
+    }
+    seenKeys.add(s.placeKey);
   }
 
   const [existing] = await db
@@ -107,7 +119,6 @@ export async function importItineraryFromJson(raw: unknown): Promise<ImportResul
         updatedAt: new Date(),
       })
       .where(eq(itineraries.id, existing.id));
-    await db.delete(stops).where(eq(stops.itineraryId, existing.id));
     itineraryId = existing.id;
     created = false;
   } else {
@@ -124,20 +135,56 @@ export async function importItineraryFromJson(raw: unknown): Promise<ImportResul
     created = true;
   }
 
-  if (json.stops.length > 0) {
-    await db.insert(stops).values(
-      json.stops.map((s) => ({
-        itineraryId,
-        day: s.day,
-        orderInDay: s.order_in_day,
-        name: s.name,
-        description: s.description ?? null,
-        lat: s.lat != null ? String(s.lat) : null,
-        lng: s.lng != null ? String(s.lng) : null,
-        arriveDate: s.arrive_date ?? null,
-        departDate: s.depart_date ?? null,
-      })),
-    );
+  const currentStops = await db
+    .select({ id: stops.id, placeKey: stops.placeKey })
+    .from(stops)
+    .where(eq(stops.itineraryId, itineraryId));
+  const currentByKey = new Map(currentStops.map((s) => [s.placeKey, s.id]));
+
+  const toInsert: typeof stops.$inferInsert[] = [];
+  for (const s of incoming) {
+    const existingId = currentByKey.get(s.placeKey);
+    const row = {
+      itineraryId,
+      day: s.day,
+      orderInDay: s.order_in_day,
+      name: s.name,
+      placeKey: s.placeKey,
+      description: s.description ?? null,
+      lat: s.lat != null ? String(s.lat) : null,
+      lng: s.lng != null ? String(s.lng) : null,
+      arriveDate: s.arrive_date ?? null,
+      departDate: s.depart_date ?? null,
+    };
+    if (existingId !== undefined) {
+      await db
+        .update(stops)
+        .set({
+          day: row.day,
+          orderInDay: row.orderInDay,
+          name: row.name,
+          description: row.description,
+          lat: row.lat,
+          lng: row.lng,
+          arriveDate: row.arriveDate,
+          departDate: row.departDate,
+        })
+        .where(and(eq(stops.id, existingId), eq(stops.itineraryId, itineraryId)));
+    } else {
+      toInsert.push(row);
+    }
+  }
+
+  if (toInsert.length > 0) {
+    await db.insert(stops).values(toInsert);
+  }
+
+  const incomingKeys = new Set(incoming.map((s) => s.placeKey));
+  const orphanIds = currentStops
+    .filter((s) => !incomingKeys.has(s.placeKey))
+    .map((s) => s.id);
+  if (orphanIds.length > 0) {
+    await db.delete(stops).where(inArray(stops.id, orphanIds));
   }
 
   return { ok: true, slug, title: json.title, stopCount: json.stops.length, created };

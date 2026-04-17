@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { auth } from "@/auth";
 import { db, videos, stops, itineraries } from "@/db";
 import { extractYouTubeId } from "@/lib/youtube";
@@ -9,14 +10,15 @@ import type { ActionResult } from "./comments";
 
 const MAX_NOTE = 500;
 
-async function slugForStop(stopId: number): Promise<string | null> {
-  const [row] = await db
+async function slugsForStop(stopId: number): Promise<string[]> {
+  const siblings = alias(stops, "sibling_stops");
+  const rows = await db
     .select({ slug: itineraries.slug })
     .from(stops)
-    .innerJoin(itineraries, eq(itineraries.id, stops.itineraryId))
-    .where(eq(stops.id, stopId))
-    .limit(1);
-  return row?.slug ?? null;
+    .innerJoin(siblings, eq(siblings.placeKey, stops.placeKey))
+    .innerJoin(itineraries, eq(itineraries.id, siblings.itineraryId))
+    .where(eq(stops.id, stopId));
+  return Array.from(new Set(rows.map((r) => r.slug)));
 }
 
 export async function createVideo(
@@ -59,8 +61,9 @@ export async function createVideo(
     note: cleanedNote,
   });
 
-  const slug = await slugForStop(stopId);
-  if (slug) revalidatePath(`/itineraries/${slug}`);
+  for (const slug of await slugsForStop(stopId)) {
+    revalidatePath(`/itineraries/${slug}`);
+  }
   return { ok: true };
 }
 
@@ -81,9 +84,11 @@ export async function deleteVideo(videoId: number): Promise<ActionResult> {
     return { ok: false, error: "Not yours to delete." };
   }
 
+  const slugs = await slugsForStop(existing.stopId);
   await db.delete(videos).where(eq(videos.id, videoId));
 
-  const slug = await slugForStop(existing.stopId);
-  if (slug) revalidatePath(`/itineraries/${slug}`);
+  for (const slug of slugs) {
+    revalidatePath(`/itineraries/${slug}`);
+  }
   return { ok: true };
 }
