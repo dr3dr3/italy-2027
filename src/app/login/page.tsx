@@ -55,7 +55,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-cream text-ink flex items-center justify-center px-6">
+    <main className="min-h-screen text-ink flex items-center justify-center px-6">
       <div className="w-full max-w-md rounded-lg border border-dust bg-white/60 p-8 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
         <h1 className="font-serif text-4xl font-semibold text-center">
           Italia 2027

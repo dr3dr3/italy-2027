@@ -171,7 +171,7 @@ export default async function Home() {
   ]);
 
   return (
-    <main className="min-h-screen bg-cream text-ink px-6 py-12">
+    <main className="min-h-screen text-ink px-6 py-12">
       <div className="absolute right-6 top-6 flex items-center gap-4">
         {isEditor && (
           <Link

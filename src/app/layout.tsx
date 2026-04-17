@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { GenerativeBackground } from "@/components/generative-background";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body
         className={`${fraunces.variable} ${inter.variable} bg-cream text-ink antialiased`}
       >
+        <GenerativeBackground />
         {children}
         <Toaster />
       </body>

@@ -1,0 +1,24 @@
+// Seeded PRNG so a given seed always produces the same pattern.
+// mulberry32 — tiny, fast, good enough for visual scatter.
+export function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+export function randomSeed(): number {
+  return Math.floor(Math.random() * 2 ** 31);
+}
+
+export function range(rng: () => number, min: number, max: number): number {
+  return min + rng() * (max - min);
+}
+
+export function pick<T>(rng: () => number, arr: readonly T[]): T {
+  return arr[Math.floor(rng() * arr.length)];
+}
