@@ -1,0 +1,126 @@
+{
+  "title": "Naples to Prague via Roma",
+  "status": "active",
+  "stops": [
+    {
+      "day": 1,
+      "order_in_day": 1,
+      "name": "Napoli",
+      "description": "Land. Pizza, espresso, jet-lag.",
+      "lat": 40.8518,
+      "lng": 14.2681,
+      "arrive_date": "2027-09-16",
+      "depart_date": "2027-09-19"
+    },
+    {
+      "day": 4,
+      "order_in_day": 1,
+      "name": "Stromboli",
+      "description": "4.5-hour ferry, one night under the volcano.",
+      "lat": 38.7944,
+      "lng": 15.2125,
+      "arrive_date": "2027-09-19",
+      "depart_date": "2027-09-20"
+    },
+    {
+      "day": 5,
+      "order_in_day": 1,
+      "name": "Tropea / Pizzo",
+      "description": "Ferry 1.5h. Calabrian coast, two nights.",
+      "lat": 38.6776,
+      "lng": 15.8987,
+      "arrive_date": "2027-09-20",
+      "depart_date": "2027-09-23"
+    },
+    {
+      "day": 8,
+      "order_in_day": 1,
+      "name": "Roma",
+      "description": "Three nights. Fast train up (3h). Forum, gelato recon, repeat.",
+      "lat": 41.9028,
+      "lng": 12.4964,
+      "arrive_date": "2027-09-23",
+      "depart_date": "2027-09-26"
+    },
+    {
+      "day": 11,
+      "order_in_day": 1,
+      "name": "Arezzo / Siena",
+      "description": "Four nights. 2h40 drive north. Tuscan base.",
+      "lat": 43.4633,
+      "lng": 11.8796,
+      "arrive_date": "2027-09-26",
+      "depart_date": "2027-09-30"
+    },
+    {
+      "day": 15,
+      "order_in_day": 1,
+      "name": "Parma",
+      "description": "Two nights. Prosciutto, parmigiano, the obvious.",
+      "lat": 44.8015,
+      "lng": 10.3279,
+      "arrive_date": "2027-09-30",
+      "depart_date": "2027-10-02"
+    },
+    {
+      "day": 17,
+      "order_in_day": 1,
+      "name": "Padova",
+      "description": "Veneto base. Padova, Lago di Garda, Verona, Bassano del Grappa, Cittadella, Castelfranco.",
+      "lat": 45.4064,
+      "lng": 11.8768,
+      "arrive_date": "2027-10-02",
+      "depart_date": "2027-10-06"
+    },
+    {
+      "day": 21,
+      "order_in_day": 1,
+      "name": "Bad Gastein",
+      "description": "Belle-époque spa town in the Austrian Alps. One night.",
+      "lat": 47.1140,
+      "lng": 13.1340,
+      "arrive_date": "2027-10-06",
+      "depart_date": "2027-10-07"
+    },
+    {
+      "day": 22,
+      "order_in_day": 1,
+      "name": "Hallstatt",
+      "description": "The famously photogenic lake village. One night.",
+      "lat": 47.5622,
+      "lng": 13.6493,
+      "arrive_date": "2027-10-07",
+      "depart_date": "2027-10-08"
+    },
+    {
+      "day": 23,
+      "order_in_day": 1,
+      "name": "Vienna",
+      "description": "Five nights. Coffee houses, Klimt, Sachertorte.",
+      "lat": 48.2082,
+      "lng": 16.3738,
+      "arrive_date": "2027-10-08",
+      "depart_date": "2027-10-13"
+    },
+    {
+      "day": 28,
+      "order_in_day": 1,
+      "name": "Prague",
+      "description": "Two nights. Then home.",
+      "lat": 50.0755,
+      "lng": 14.4378,
+      "arrive_date": "2027-10-13",
+      "depart_date": "2027-10-15"
+    },
+    {
+      "day": 30,
+      "order_in_day": 1,
+      "name": "Fly home from Prague",
+      "description": "Cheapest of Vienna / Berlin / Prague. Brisbane via wherever.",
+      "lat": 50.1008,
+      "lng": 14.2632,
+      "arrive_date": "2027-10-15",
+      "depart_date": "2027-10-15"
+    }
+  ]
+}

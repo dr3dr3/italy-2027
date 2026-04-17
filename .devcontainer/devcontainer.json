@@ -1,0 +1,39 @@
+{
+    "name": "italy-2027",
+
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+    "workspaceFolder": "/workspace",
+
+    "forwardPorts": [3000],
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "github.vscode-pull-request-github",
+                "github.copilot",
+                "github.copilot-chat",
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint",
+                "bradlc.vscode-tailwindcss"
+            ],
+            "settings": {
+                "editor.fontFamily": "FiraCode Nerd Font, monospace",
+                "editor.fontSize": 14,
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash"
+                    }
+                }
+            }
+        }
+    },
+
+    "remoteUser": "dev",
+
+    "postCreateCommand": "git config --global user.name 'André Dreyer' && git config --global user.email 'github@andredreyer.com'"
+}

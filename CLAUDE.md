@@ -106,6 +106,9 @@ sessions matters more than local cleverness.
 - Don't add tests unless explicitly asked (we're deliberately skipping TDD here)
 - Don't refactor working code unless asked
 - Don't install packages without flagging it first
+- Don't add per-stop database queries inside the render loop on the detail
+  page — all data is fetched at page level and passed as props. See the
+  comment in `/itineraries/[slug]/page.tsx`.
 
 ## When in doubt
 
