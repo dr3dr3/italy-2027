@@ -9,6 +9,14 @@ import { users, accounts, sessions, verificationTokens } from "@/db/schema";
 const EMAIL_FROM = process.env.AUTH_EMAIL_FROM!;
 const RESEND_KEY = process.env.AUTH_RESEND_KEY!;
 
+// Extra editors beyond whoever's flagged in the DB. Comma-separated emails.
+const EDITOR_EMAILS = new Set(
+  (process.env.EDITOR_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean),
+);
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   // NOTE: the Drizzle adapter's TS types assume string user ids (text/varchar/uuid),
   // but our users.id is bigserial. Runtime is fine — ids round-trip as numbers from
@@ -88,7 +96,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (row) {
         session.user.id = String(row.id);
         session.user.name = row.name ?? undefined;
-        session.user.isEditor = row.isEditor;
+        session.user.isEditor =
+          row.isEditor || EDITOR_EMAILS.has(user.email!.toLowerCase());
         // Throttle presence touches — avoids slamming the DB on every auth() call.
         const last = row.lastSeenAt?.getTime() ?? 0;
         if (Date.now() - last > 60_000) {
