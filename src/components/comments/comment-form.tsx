@@ -46,15 +46,19 @@ export function CommentForm({
         disabled={isPending}
         rows={3}
         placeholder="Say something…"
-        className="w-full resize-y rounded border border-dust bg-white/60 px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40 focus:bg-white"
+        className="w-full resize-y rounded border border-dust bg-white/90 px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40 focus:bg-white"
         suppressHydrationWarning
       />
       <div className="flex items-center justify-between">
-        <span
-          className={`text-xs ${tooLong ? "text-wine" : "text-ink/40"}`}
-        >
-          {trimmed.length}/{MAX_BODY}
-        </span>
+        {trimmed.length > MAX_BODY - 200 ? (
+          <span
+            className={`text-xs ${tooLong ? "text-wine" : "text-ink/40"}`}
+          >
+            {trimmed.length}/{MAX_BODY}
+          </span>
+        ) : (
+          <span />
+        )}
         <Button
           type="submit"
           disabled={disabled}

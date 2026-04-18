@@ -62,7 +62,7 @@ export function VideoForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="space-y-3 rounded-lg border border-dust bg-white/60 p-4"
+      className="space-y-3 rounded-lg border border-dust bg-white p-4"
       suppressHydrationWarning
     >
       {isEmpty && (

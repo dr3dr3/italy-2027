@@ -10,5 +10,5 @@ export type BackgroundConfig = {
 
 export const backgroundConfig: BackgroundConfig = {
   enabled: true,
-  variant: "terrazzo",
+  variant: "vineyard",
 };
