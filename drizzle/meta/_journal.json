@@ -43,6 +43,13 @@
       "when": 1776419034657,
       "tag": "0005_faithful_blackheart",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1776493265639,
+      "tag": "0006_magenta_marvel_boy",
+      "breakpoints": true
     }
   ]
 }

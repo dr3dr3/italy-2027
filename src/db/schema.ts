@@ -197,6 +197,49 @@ export const videos = pgTable(
   ],
 );
 
+export const visits = pgTable(
+  "visits",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    stopId: bigint("stop_id", { mode: "number" })
+      .notNull()
+      .references(() => stops.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    name: text("name").notNull(),
+    description: text("description"),
+    lat: numeric("lat"),
+    lng: numeric("lng"),
+    visitDate: date("visit_date"),
+    orderInLeg: integer("order_in_leg").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("visits_stop_id_idx").on(t.stopId)],
+);
+
+export const wishlistDestinations = pgTable(
+  "wishlist_destinations",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    addedBy: bigint("added_by", { mode: "number" })
+      .notNull()
+      .references(() => users.id),
+    name: text("name").notNull(),
+    description: text("description"),
+    lat: numeric("lat"),
+    lng: numeric("lng"),
+    status: text("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("wishlist_added_by_idx").on(t.addedBy),
+    index("wishlist_status_idx").on(t.status),
+  ],
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Itinerary = typeof itineraries.$inferSelect;
@@ -211,3 +254,7 @@ export type Suggestion = typeof suggestions.$inferSelect;
 export type NewSuggestion = typeof suggestions.$inferInsert;
 export type Video = typeof videos.$inferSelect;
 export type NewVideo = typeof videos.$inferInsert;
+export type Visit = typeof visits.$inferSelect;
+export type NewVisit = typeof visits.$inferInsert;
+export type WishlistDestination = typeof wishlistDestinations.$inferSelect;
+export type NewWishlistDestination = typeof wishlistDestinations.$inferInsert;
