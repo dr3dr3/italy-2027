@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { asc, eq } from "drizzle-orm";
+import { MessageCircle } from "lucide-react";
 import { db, itineraries, stops } from "@/db";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDay, formatRange } from "@/lib/dates";
@@ -114,11 +115,11 @@ export default async function ItineraryPage({
           ← Le opzioni
         </Link>
 
-        <header className="mt-6 mb-10 flex items-start justify-between gap-4">
+        <header className="mt-6 mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <h1 className="font-serif text-4xl font-semibold">
             {itinerary.title}
           </h1>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <StatusBadge status={itinerary.status} />
             {isEditor && (
               <ItineraryStatusControl
@@ -126,6 +127,14 @@ export default async function ItineraryPage({
                 status={itinerary.status as "draft" | "active" | "archived"}
               />
             )}
+            <a
+              href="#discussion"
+              aria-label={`Jump to discussion (${itineraryComments.length} comments)`}
+              className="inline-flex h-8 items-center gap-1.5 rounded-full border border-dust bg-white/80 px-2.5 text-sm text-ink/70 transition-colors hover:border-ink/30 hover:text-ink"
+            >
+              <MessageCircle className="size-4" />
+              <span className="tabular-nums">{itineraryComments.length}</span>
+            </a>
             <VoteButton
               targetType="itinerary"
               targetId={itinerary.id}
@@ -157,13 +166,27 @@ export default async function ItineraryPage({
           <span className="text-ink/40 text-xl font-normal">/ the plan</span>
         </h2>
 
+        {dayNumbers.length > 1 && (
+          <nav className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-sm text-ink/60">
+            {dayNumbers.map((day) => (
+              <a
+                key={day}
+                href={`#day-${day}`}
+                className="hover:text-ink"
+              >
+                Day {day}
+              </a>
+            ))}
+          </nav>
+        )}
+
         <ol className="mt-6 space-y-8">
           {dayNumbers.map((day) => {
             const dayStops = days.get(day)!;
             const firstArrive = dayStops[0].arriveDate;
             return (
-              <li key={day}>
-                <h3 className="font-serif text-xl font-semibold text-ink/80">
+              <li key={day} id={`day-${day}`} className="scroll-mt-6">
+                <h3 className="font-serif text-2xl font-semibold">
                   Day {day}
                   {firstArrive && (
                     <span className="text-ink/40">
@@ -182,11 +205,11 @@ export default async function ItineraryPage({
                       <div
                         key={s.id}
                         id={`stop-${s.id}`}
-                        className="rounded-lg border border-dust bg-white/60 p-5 scroll-mt-6"
+                        className="rounded-lg border border-dust bg-white/85 p-5 scroll-mt-6"
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <h4 className="font-serif text-xl font-semibold">
+                            <h4 className="font-serif text-lg font-semibold">
                               {s.name}
                             </h4>
                             {s.arriveDate && s.departDate && (
@@ -240,7 +263,7 @@ export default async function ItineraryPage({
           })}
         </ol>
 
-        <section className="mt-16">
+        <section id="discussion" className="mt-16 scroll-mt-6">
           <h2 className="font-serif text-2xl font-semibold">
             La discussione{" "}
             <span className="text-ink/40 text-xl font-normal">

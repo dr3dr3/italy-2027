@@ -38,3 +38,16 @@ body {
 .highlight-flash {
   animation: highlight-flash 1.5s ease-out;
 }
+
+@keyframes discussion-arrive {
+  0%, 25% {
+    background-color: color-mix(in srgb, var(--terracotta) 16%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+#discussion:target > h2 {
+  animation: discussion-arrive 1400ms ease-out;
+}
