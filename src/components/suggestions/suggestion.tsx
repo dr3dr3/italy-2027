@@ -25,7 +25,7 @@ export function Suggestion({
   return (
     <div
       className={`rounded-lg border border-dust bg-white/85 p-4 ${
-        s.isConfirmed ? "bg-olive/5" : ""
+        s.isConfirmed ? "bg-olive/10" : ""
       }`}
     >
       <div className="flex items-start justify-between gap-3">

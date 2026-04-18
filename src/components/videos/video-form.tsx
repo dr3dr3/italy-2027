@@ -33,12 +33,15 @@ export function VideoForm({
   const noteTooLong = note.length > MAX_NOTE;
   const disabled = isPending || !validId || noteTooLong;
 
+  const [error, setError] = useState<string | null>(null);
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
     startTransition(async () => {
       const result = await createVideo(stopId, url, note || undefined);
       if (!result.ok) {
-        toast.error(result.error);
+        setError(result.error);
         return;
       }
       close();
@@ -103,6 +106,9 @@ export function VideoForm({
           </p>
         )}
       </div>
+      {error && (
+        <p className="text-sm text-wine">{error}</p>
+      )}
       <div className="flex items-center justify-end gap-2">
         <Button
           type="button"

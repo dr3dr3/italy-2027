@@ -37,8 +37,11 @@ export function SuggestionForm({ stopId }: { stopId: number }) {
     setOpen(false);
   }
 
+  const [error, setError] = useState<string | null>(null);
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
     startTransition(async () => {
       const result = await createSuggestion(
         stopId,
@@ -48,7 +51,7 @@ export function SuggestionForm({ stopId }: { stopId: number }) {
         notes || undefined,
       );
       if (!result.ok) {
-        toast.error(result.error);
+        setError(result.error);
         return;
       }
       close();
@@ -162,6 +165,9 @@ export function SuggestionForm({ stopId }: { stopId: number }) {
           </p>
         )}
       </div>
+      {error && (
+        <p className="text-sm text-wine">{error}</p>
+      )}
       <div className="flex items-center justify-end gap-2">
         <Button
           type="button"

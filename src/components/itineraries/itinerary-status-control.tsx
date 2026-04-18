@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { setItineraryStatus } from "@/lib/actions/itineraries";
 
@@ -49,12 +49,33 @@ export function ItineraryStatusControl({
   itineraryId: number;
   status: Status;
 }) {
+  const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const ref = useRef<HTMLDivElement>(null);
   const actions = actionsFor(status);
+
+  useEffect(() => {
+    if (!open) return;
+    function onClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function onEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    document.addEventListener("keydown", onEscape);
+    return () => {
+      document.removeEventListener("mousedown", onClickOutside);
+      document.removeEventListener("keydown", onEscape);
+    };
+  }, [open]);
 
   function run(action: Action) {
     if (action.disabled) return;
     if (action.confirm && !window.confirm(action.confirm)) return;
+    setOpen(false);
     startTransition(async () => {
       const result = await setItineraryStatus(itineraryId, action.to);
       if (!result.ok) {
@@ -66,27 +87,34 @@ export function ItineraryStatusControl({
   }
 
   return (
-    <details className="relative">
-      <summary className="cursor-pointer list-none rounded-md border border-dust bg-white/80 px-2 py-1 text-xs font-medium text-ink/70 hover:bg-white">
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="cursor-pointer rounded-md border border-dust bg-white/85 px-2 py-1 text-xs font-medium text-ink/70 hover:bg-white"
+        aria-expanded={open}
+      >
         Manage ▾
-      </summary>
-      <div className="absolute right-0 z-10 mt-1 w-40 rounded-md border border-dust bg-white shadow-sm">
-        <ul className="py-1">
-          {actions.map((a) => (
-            <li key={a.label}>
-              <button
-                type="button"
-                disabled={isPending || a.disabled}
-                onClick={() => run(a)}
-                title={a.disabledReason}
-                className="block w-full px-3 py-1.5 text-left text-sm text-ink hover:bg-dust/40 disabled:cursor-not-allowed disabled:text-ink/40 disabled:hover:bg-transparent"
-              >
-                {a.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </details>
+      </button>
+      {open && (
+        <div className="absolute right-0 z-10 mt-1 w-40 rounded-md border border-dust bg-white shadow-sm">
+          <ul className="py-1">
+            {actions.map((a) => (
+              <li key={a.label}>
+                <button
+                  type="button"
+                  disabled={isPending || a.disabled}
+                  onClick={() => run(a)}
+                  title={a.disabledReason}
+                  className="block w-full px-3 py-1.5 text-left text-sm text-ink hover:bg-dust/40 disabled:cursor-not-allowed disabled:text-ink/40 disabled:hover:bg-transparent"
+                >
+                  {a.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }

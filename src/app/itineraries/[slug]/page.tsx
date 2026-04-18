@@ -130,7 +130,7 @@ export default async function ItineraryPage({
             <a
               href="#discussion"
               aria-label={`Jump to discussion (${itineraryComments.length} comments)`}
-              className="inline-flex h-8 items-center gap-1.5 rounded-full border border-dust bg-white/80 px-2.5 text-sm text-ink/70 transition-colors hover:border-ink/30 hover:text-ink"
+              className="inline-flex h-8 items-center gap-1.5 rounded-full border border-dust bg-white/85 px-2.5 text-sm text-ink/70 transition-colors hover:border-ink/30 hover:text-ink"
             >
               <MessageCircle className="size-4" />
               <span className="tabular-nums">{itineraryComments.length}</span>
@@ -279,6 +279,15 @@ export default async function ItineraryPage({
             />
           </div>
         </section>
+
+        {stopRows.length > 0 && (
+          <footer className="mt-12 pb-4 text-center text-sm text-ink/40 font-serif italic">
+            {stopRows.length} {stopRows.length === 1 ? "stop" : "stops"} · {dayNumbers.length} {dayNumbers.length === 1 ? "day" : "days"}
+            {stopRows[0].arriveDate && (
+              <> · leaving {formatDay(stopRows[0].arriveDate)}</>
+            )}
+          </footer>
+        )}
       </div>
     </main>
   );

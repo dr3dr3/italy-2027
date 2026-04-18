@@ -22,12 +22,15 @@ export function CommentForm({
   const tooLong = trimmed.length > MAX_BODY;
   const disabled = isPending || trimmed.length === 0 || tooLong;
 
+  const [error, setError] = useState<string | null>(null);
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
     startTransition(async () => {
       const result = await createComment(targetType, targetId, body);
       if (!result.ok) {
-        toast.error(result.error);
+        setError(result.error);
         return;
       }
       setBody("");
@@ -46,9 +49,12 @@ export function CommentForm({
         disabled={isPending}
         rows={3}
         placeholder="Say something…"
-        className="w-full resize-y rounded border border-dust bg-white/90 px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40 focus:bg-white"
+        className="w-full resize-y rounded border border-dust bg-white/85 px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40 focus:bg-white"
         suppressHydrationWarning
       />
+      {error && (
+        <p className="text-sm text-wine">{error}</p>
+      )}
       <div className="flex items-center justify-between">
         {trimmed.length > MAX_BODY - 200 ? (
           <span
