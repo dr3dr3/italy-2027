@@ -41,7 +41,7 @@ export async function createComment(
     body: trimmed,
   });
 
-  revalidatePath(`/itineraries/${target.itinerarySlug}`);
+  for (const path of target.revalidatePaths) revalidatePath(path);
   return { ok: true };
 }
 
@@ -82,7 +82,7 @@ export async function deleteComment(
     existing.targetId,
   );
   if (target.ok) {
-    revalidatePath(`/itineraries/${target.itinerarySlug}`);
+    for (const path of target.revalidatePaths) revalidatePath(path);
   }
   return { ok: true };
 }

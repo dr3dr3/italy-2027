@@ -71,7 +71,7 @@ export async function createSuggestion(
     notes: cleanedNotes,
   });
 
-  revalidatePath(`/itineraries/${target.itinerarySlug}`);
+  for (const path of target.revalidatePaths) revalidatePath(path);
   return { ok: true };
 }
 

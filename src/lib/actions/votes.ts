@@ -48,7 +48,7 @@ export async function toggleVote(
     });
   }
 
-  revalidatePath(`/itineraries/${target.itinerarySlug}`);
+  for (const path of target.revalidatePaths) revalidatePath(path);
   revalidatePath("/");
   return { ok: true };
 }
