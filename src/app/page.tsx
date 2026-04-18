@@ -16,6 +16,7 @@ import { ActiveUsers } from "@/components/presence/active-users";
 import { getActivePresence } from "@/lib/queries/users";
 import { WishlistSection } from "@/components/wishlist/wishlist-section";
 import { getPendingWishlist } from "@/lib/queries/wishlist";
+import { getCommentsForPendingWishlist } from "@/lib/queries/comments";
 
 // Per-itinerary styling. Colour + dash pattern differ together so colour-blind
 // viewers have two redundant encodings. Labels (A/B/…) land on the pins and
@@ -156,13 +157,15 @@ export default async function Home() {
   const userId = session?.user?.id ? Number(session.user.id) : null;
   const isEditor = Boolean(session?.user?.isEditor);
 
-  const [visible, overview, archived, presences, wishlist] = await Promise.all([
-    loadItinerariesByStatus(isEditor ? ["draft", "active"] : ["active"]),
-    loadOverviewItineraries(),
-    isEditor ? loadItinerariesByStatus(["archived"]) : Promise.resolve([]),
-    getActivePresence(),
-    getPendingWishlist(userId),
-  ]);
+  const [visible, overview, archived, presences, wishlist, wishlistComments] =
+    await Promise.all([
+      loadItinerariesByStatus(isEditor ? ["draft", "active"] : ["active"]),
+      loadOverviewItineraries(),
+      isEditor ? loadItinerariesByStatus(["archived"]) : Promise.resolve([]),
+      getActivePresence(),
+      getPendingWishlist(userId),
+      getCommentsForPendingWishlist(),
+    ]);
 
   const visibleVoteIds = visible.map((r) => r.id);
   const archivedVoteIds = archived.map((r) => r.id);
@@ -255,6 +258,7 @@ export default async function Home() {
 
         <WishlistSection
           rows={wishlist}
+          comments={wishlistComments}
           currentUserId={userId}
           isEditor={isEditor}
         />

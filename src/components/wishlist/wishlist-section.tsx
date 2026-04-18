@@ -1,13 +1,16 @@
 import type { WishlistRow } from "@/lib/queries/wishlist";
+import type { CommentRow } from "@/lib/queries/comments";
 import { WishlistItem } from "./wishlist-item";
 import { WishlistForm } from "./wishlist-form";
 
 export function WishlistSection({
   rows,
+  comments,
   currentUserId,
   isEditor,
 }: {
   rows: WishlistRow[];
+  comments: Map<number, CommentRow[]>;
   currentUserId: number | null;
   isEditor: boolean;
 }) {
@@ -31,6 +34,7 @@ export function WishlistSection({
             <WishlistItem
               key={row.id}
               row={row}
+              comments={comments.get(row.id) ?? []}
               currentUserId={currentUserId}
               isEditor={isEditor}
             />

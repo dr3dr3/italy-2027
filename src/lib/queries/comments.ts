@@ -1,5 +1,12 @@
 import { and, asc, eq, sql } from "drizzle-orm";
-import { db, comments, users, stops, suggestions } from "@/db";
+import {
+  db,
+  comments,
+  users,
+  stops,
+  suggestions,
+  wishlistDestinations,
+} from "@/db";
 import type { TargetType } from "@/lib/polymorphic";
 
 /** @deprecated use TargetType from @/lib/polymorphic */
@@ -111,6 +118,46 @@ export async function getSuggestionCommentsForItinerary(
     bySuggestion.set(suggestionId, arr);
   }
   return bySuggestion;
+}
+
+/**
+ * All comments for pending wishlist destinations, keyed by wishlist id.
+ * Home page renders each item with a toggled thread, so we batch the
+ * fetch and filter to status='pending' via the join.
+ */
+export async function getCommentsForPendingWishlist(): Promise<
+  Map<number, CommentRow[]>
+> {
+  const rows = await db
+    .select({
+      wishlistId: comments.targetId,
+      id: comments.id,
+      body: comments.body,
+      createdAt: comments.createdAt,
+      userId: comments.userId,
+      userName: users.name,
+    })
+    .from(comments)
+    .innerJoin(users, eq(users.id, comments.userId))
+    .innerJoin(
+      wishlistDestinations,
+      eq(wishlistDestinations.id, comments.targetId),
+    )
+    .where(
+      and(
+        eq(comments.targetType, "wishlist_destination"),
+        eq(wishlistDestinations.status, "pending"),
+      ),
+    )
+    .orderBy(asc(comments.createdAt));
+  const byWishlist = new Map<number, CommentRow[]>();
+  for (const r of rows) {
+    const { wishlistId, ...comment } = r;
+    const arr = byWishlist.get(wishlistId) ?? [];
+    arr.push(comment);
+    byWishlist.set(wishlistId, arr);
+  }
+  return byWishlist;
 }
 
 /**
