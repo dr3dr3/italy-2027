@@ -112,7 +112,7 @@ export default async function ItineraryPage({
           href="/"
           className="text-sm text-ink/60 hover:text-ink"
         >
-          ← Le opzioni
+          ← Le opzioni <span className="text-ink/40">/ back</span>
         </Link>
 
         <header className="mt-6 mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -155,7 +155,7 @@ export default async function ItineraryPage({
               <ItineraryMapLoader stops={mapStops} />
             ) : (
               <p className="text-sm text-ink/50">
-                No coordinates on any stops yet.
+                Somewhere in Italy, probably.
               </p>
             )}
           </div>

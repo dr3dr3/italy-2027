@@ -110,7 +110,7 @@ function ItineraryCard({
     <li className="relative">
       <Link
         href={`/itineraries/${it.slug}`}
-        className="block rounded-lg border border-dust bg-white/85 p-6 pb-14 transition-colors hover:bg-white/95"
+        className="block rounded-lg border border-dust bg-white/85 p-6 pb-14 transition-colors hover:bg-white"
       >
         <div className="flex items-start justify-between gap-4">
           <h2 className="font-serif text-2xl font-semibold">{it.title}</h2>

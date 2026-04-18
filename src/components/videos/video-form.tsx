@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { extractYouTubeId } from "@/lib/youtube";
 import { createVideo } from "@/lib/actions/videos";
 
@@ -74,7 +75,11 @@ export function VideoForm({
         </p>
       )}
       <div className="space-y-1">
+        <Label htmlFor={`video-url-${stopId}`} className="text-xs">
+          YouTube link
+        </Label>
         <Input
+          id={`video-url-${stopId}`}
           type="url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
@@ -90,7 +95,11 @@ export function VideoForm({
         )}
       </div>
       <div className="space-y-1">
+        <Label htmlFor={`video-note-${stopId}`} className="text-xs">
+          Note <span className="text-ink/40">(optional)</span>
+        </Label>
         <Input
+          id={`video-note-${stopId}`}
           type="text"
           value={note}
           onChange={(e) => setNote(e.target.value)}
