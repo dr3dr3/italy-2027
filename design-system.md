@@ -33,9 +33,10 @@ colors: {
 
 Two fonts, both Google Fonts, loaded via `next/font`:
 
-- **Fraunces** — headings, page titles, stop names. Used big and confident.
-  Weights: 400, 600. Optical size: auto.
-- **Inter** — body, UI, buttons, forms, everything else. Weights: 400, 500, 600.
+- **Bitter** — headings, page titles, stop names. A warm slab serif with sturdiness
+  and print-book character. Weights: 400, 600.
+- **Source Sans 3** — body, UI, buttons, forms, everything else. Adobe's humanist
+  sans — warmer than Inter with better text-setting proportions. Weights: 400, 500, 600.
 
 Scale (Tailwind classes assume these):
 

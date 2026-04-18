@@ -16,14 +16,14 @@
   --color-olive: var(--olive);
   --color-dust: var(--dust);
   --color-wine: var(--wine);
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-fraunces);
+  --font-sans: var(--font-source-sans);
+  --font-serif: var(--font-bitter);
 }
 
 body {
   background: var(--cream);
   color: var(--ink);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-source-sans), system-ui, sans-serif;
 }
 
 @keyframes highlight-flash {

@@ -14,6 +14,8 @@ import { ItineraryStatusControl } from "@/components/itineraries/itinerary-statu
 import { ArchivedToggle } from "@/components/itineraries/archived-toggle";
 import { ActiveUsers } from "@/components/presence/active-users";
 import { getActivePresence } from "@/lib/queries/users";
+import { WishlistSection } from "@/components/wishlist/wishlist-section";
+import { getPendingWishlist } from "@/lib/queries/wishlist";
 
 // Per-itinerary styling. Colour + dash pattern differ together so colour-blind
 // viewers have two redundant encodings. Labels (A/B/…) land on the pins and
@@ -154,11 +156,12 @@ export default async function Home() {
   const userId = session?.user?.id ? Number(session.user.id) : null;
   const isEditor = Boolean(session?.user?.isEditor);
 
-  const [visible, overview, archived, presences] = await Promise.all([
+  const [visible, overview, archived, presences, wishlist] = await Promise.all([
     loadItinerariesByStatus(isEditor ? ["draft", "active"] : ["active"]),
     loadOverviewItineraries(),
     isEditor ? loadItinerariesByStatus(["archived"]) : Promise.resolve([]),
     getActivePresence(),
+    getPendingWishlist(userId),
   ]);
 
   const visibleVoteIds = visible.map((r) => r.id);
@@ -249,6 +252,12 @@ export default async function Home() {
             ))}
           </ul>
         )}
+
+        <WishlistSection
+          rows={wishlist}
+          currentUserId={userId}
+          isEditor={isEditor}
+        />
 
         {isEditor && (
           <ArchivedToggle count={archived.length}>
