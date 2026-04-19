@@ -178,7 +178,7 @@ export default async function ItineraryPage({
           href="/"
           className="animate-in text-sm text-ink/60 hover:text-ink"
         >
-          ← Le opzioni <span className="text-ink/40">/ back</span>
+          ← Le opzioni <span className="text-ink/50">/ back</span>
         </Link>
 
         <header
@@ -272,7 +272,7 @@ export default async function ItineraryPage({
                 <h3 className="font-serif text-2xl font-semibold">
                   Day {day}
                   {firstArrive && (
-                    <span className="text-ink/40">
+                    <span className="text-ink/50">
                       {" "}
                       · {formatDay(firstArrive)}
                     </span>
@@ -375,7 +375,7 @@ export default async function ItineraryPage({
         </section>
 
         {stopRows.length > 0 && (
-          <footer className="mt-12 pb-4 text-center text-sm text-ink/40 font-serif italic">
+          <footer className="mt-12 pb-4 text-center text-sm text-ink/60 font-serif italic">
             {stopRows.length} {stopRows.length === 1 ? "stop" : "stops"} · {dayNumbers.length} {dayNumbers.length === 1 ? "day" : "days"}
             {stopRows[0].arriveDate && (
               <> · leaving {formatDay(stopRows[0].arriveDate)}</>

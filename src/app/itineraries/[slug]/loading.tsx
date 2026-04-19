@@ -1,7 +1,7 @@
 export default function Loading() {
   return (
     <main className="min-h-screen text-ink px-6 py-12">
-      <div className="mx-auto max-w-3xl animate-pulse">
+      <div className="mx-auto max-w-3xl animate-pulse" role="status" aria-label="Loading itinerary">
         <div className="h-4 w-24 rounded bg-dust/70" />
 
         <header className="mt-6 mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

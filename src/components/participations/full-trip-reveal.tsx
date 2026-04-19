@@ -16,7 +16,8 @@ export function FullTripReveal({
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
-        className="text-xs text-ink/60 hover:text-ink"
+        className="py-1 text-xs text-ink/60 hover:text-ink"
+        aria-expanded={expanded}
       >
         {expanded
           ? "Hide"

@@ -65,7 +65,7 @@ export function ItineraryImport() {
         onChange={onChange}
         spellCheck={false}
         placeholder='{ "title": "…", "status": "draft", "stops": [ … ] }'
-        className="block min-h-100 w-full rounded-md border border-dust bg-white/80 p-3 font-mono text-sm text-ink focus:border-terracotta focus:outline-none"
+        className="block min-h-100 w-full rounded-md border border-dust bg-white/85 p-3 font-mono text-sm text-ink focus:border-terracotta focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:ring-offset-1"
       />
 
       <div className="flex items-center gap-3">
@@ -73,7 +73,7 @@ export function ItineraryImport() {
           type="button"
           onClick={validate}
           disabled={json.trim().length === 0}
-          className="rounded-md border border-dust bg-white/80 px-3 py-1.5 text-sm font-medium text-ink/80 hover:bg-white disabled:opacity-50"
+          className="rounded-md border border-dust bg-white/85 px-3 py-1.5 text-sm font-medium text-ink/80 hover:bg-white disabled:opacity-50"
         >
           Validate
         </button>

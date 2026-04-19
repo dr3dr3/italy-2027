@@ -24,7 +24,7 @@ export function DeleteWishlistButton({ id }: { id: number }) {
           router.refresh();
         });
       }}
-      className="text-xs text-ink/40 hover:text-wine disabled:opacity-50"
+      className="text-xs text-ink/60 hover:text-wine disabled:opacity-50"
     >
       {isPending ? "Deleting…" : "Delete"}
     </button>

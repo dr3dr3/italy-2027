@@ -57,7 +57,7 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen min-h-dvh items-center justify-center px-6 text-ink">
-      <div className="w-full max-w-md rounded-lg border border-dust bg-white/85 p-8 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+      <div className="w-full max-w-md rounded-lg border border-dust bg-white/85 p-8 shadow-sm">
         <h1 className="font-serif text-4xl font-semibold text-center">
           Italia 2027
         </h1>

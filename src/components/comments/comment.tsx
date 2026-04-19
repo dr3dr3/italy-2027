@@ -23,7 +23,7 @@ export function Comment({
         </div>
         {mine && <DeleteCommentButton commentId={comment.id} />}
       </div>
-      <p className="mt-1 whitespace-pre-wrap text-base text-ink/90">
+      <p className="mt-1 whitespace-pre-wrap text-base text-ink/80">
         {comment.body}
       </p>
     </div>

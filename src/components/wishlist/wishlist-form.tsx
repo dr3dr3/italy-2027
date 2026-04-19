@@ -85,14 +85,14 @@ export function WishlistForm() {
           suppressHydrationWarning
         />
         {(nameNearLimit || nameTooLong) && (
-          <p className={`text-xs ${nameTooLong ? "text-wine" : "text-ink/40"}`}>
+          <p className={`text-xs ${nameTooLong ? "text-wine" : "text-ink/60"}`}>
             {name.length}/{MAX_NAME}
           </p>
         )}
       </div>
       <div className="space-y-1">
         <Label htmlFor="wishlist-description" className="text-xs">
-          Why <span className="text-ink/40">(optional)</span>
+          Why <span className="text-ink/60">(optional)</span>
         </Label>
         <textarea
           id="wishlist-description"
@@ -101,11 +101,11 @@ export function WishlistForm() {
           disabled={isPending}
           rows={3}
           placeholder="What's the pitch?"
-          className="w-full resize-y rounded border border-dust bg-white px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40"
+          className="w-full resize-y rounded border border-dust bg-white px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40 focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:ring-offset-1"
           suppressHydrationWarning
         />
         {(descNearLimit || descTooLong) && (
-          <p className={`text-xs ${descTooLong ? "text-wine" : "text-ink/40"}`}>
+          <p className={`text-xs ${descTooLong ? "text-wine" : "text-ink/60"}`}>
             {description.length}/{MAX_DESCRIPTION}
           </p>
         )}
