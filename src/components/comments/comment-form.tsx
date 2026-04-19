@@ -48,8 +48,9 @@ export function CommentForm({
         onChange={(e) => setBody(e.target.value)}
         disabled={isPending}
         rows={3}
+        aria-label="Add a comment"
         placeholder="Say something…"
-        className="w-full resize-y rounded border border-dust bg-white/85 px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40 focus:bg-white"
+        className="w-full resize-y rounded border border-dust bg-white/85 px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40 focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:ring-offset-1 focus:bg-white"
         suppressHydrationWarning
       />
       {error && (
@@ -58,7 +59,7 @@ export function CommentForm({
       <div className="flex items-center justify-between">
         {trimmed.length > MAX_BODY - 200 ? (
           <span
-            className={`text-xs ${tooLong ? "text-wine" : "text-ink/40"}`}
+            className={`text-xs ${tooLong ? "text-wine" : "text-ink/60"}`}
           >
             {trimmed.length}/{MAX_BODY}
           </span>

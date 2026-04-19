@@ -97,7 +97,7 @@ export function SuggestionForm({ stopId }: { stopId: number }) {
             value={kind}
             onChange={(e) => setKind(e.target.value as typeof kind)}
             disabled={isPending}
-            className="h-9 w-full rounded border border-dust bg-white px-2 text-sm text-ink focus:border-ink/40 outline-none"
+            className="h-9 w-full rounded border border-dust bg-white px-2 text-sm text-ink focus:border-ink/40 outline-none focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:ring-offset-1"
           >
             {KINDS.map((k) => (
               <option key={k.value} value={k.value}>
@@ -122,7 +122,7 @@ export function SuggestionForm({ stopId }: { stopId: number }) {
           />
           {(titleNearLimit || titleTooLong) && (
             <p
-              className={`text-xs ${titleTooLong ? "text-wine" : "text-ink/40"}`}
+              className={`text-xs ${titleTooLong ? "text-wine" : "text-ink/60"}`}
             >
               {title.length}/{MAX_TITLE}
             </p>
@@ -131,7 +131,7 @@ export function SuggestionForm({ stopId }: { stopId: number }) {
       </div>
       <div className="space-y-1">
         <Label htmlFor={`url-${stopId}`} className="text-xs">
-          Link <span className="text-ink/40">(optional)</span>
+          Link <span className="text-ink/60">(optional)</span>
         </Label>
         <Input
           id={`url-${stopId}`}
@@ -145,7 +145,7 @@ export function SuggestionForm({ stopId }: { stopId: number }) {
       </div>
       <div className="space-y-1">
         <Label htmlFor={`notes-${stopId}`} className="text-xs">
-          Notes <span className="text-ink/40">(optional)</span>
+          Notes <span className="text-ink/60">(optional)</span>
         </Label>
         <textarea
           id={`notes-${stopId}`}
@@ -154,12 +154,12 @@ export function SuggestionForm({ stopId }: { stopId: number }) {
           disabled={isPending}
           rows={3}
           placeholder="Why's this worth it?"
-          className="w-full resize-y rounded border border-dust bg-white px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40"
+          className="w-full resize-y rounded border border-dust bg-white px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40 focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:ring-offset-1"
           suppressHydrationWarning
         />
         {(notesNearLimit || notesTooLong) && (
           <p
-            className={`text-xs ${notesTooLong ? "text-wine" : "text-ink/40"}`}
+            className={`text-xs ${notesTooLong ? "text-wine" : "text-ink/60"}`}
           >
             {notes.length}/{MAX_NOTES}
           </p>

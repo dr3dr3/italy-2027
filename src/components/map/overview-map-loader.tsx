@@ -6,7 +6,7 @@ import type { OverviewItinerary } from "./overview-map";
 function OverviewMapSkeleton() {
   return (
     <div className="h-60 md:h-80 w-full rounded-lg border border-dust bg-cream flex items-center justify-center">
-      <span className="text-sm text-ink/40">Loading map…</span>
+      <span className="text-sm text-ink/60">Loading map…</span>
     </div>
   );
 }

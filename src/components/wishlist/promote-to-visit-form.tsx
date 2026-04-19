@@ -117,7 +117,7 @@ export function PromoteToVisitForm({
             value={kind}
             onChange={(e) => setKind(e.target.value as Kind)}
             disabled={isPending}
-            className="h-9 w-full rounded border border-dust bg-white px-2 text-sm text-ink focus:border-ink/40 outline-none"
+            className="h-9 w-full rounded border border-dust bg-white px-2 text-sm text-ink focus:border-ink/40 outline-none focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:ring-offset-1"
           >
             <option value="daytrip">Daytrip (round-trip)</option>
             <option value="enroute">Enroute (on the drive)</option>
@@ -130,7 +130,7 @@ export function PromoteToVisitForm({
             value={itineraryId}
             onChange={(e) => setItineraryId(e.target.value ? Number(e.target.value) : "")}
             disabled={isPending}
-            className="h-9 w-full rounded border border-dust bg-white px-2 text-sm text-ink focus:border-ink/40 outline-none"
+            className="h-9 w-full rounded border border-dust bg-white px-2 text-sm text-ink focus:border-ink/40 outline-none focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:ring-offset-1"
           >
             {targets.map((t) => (
               <option key={t.id} value={t.id}>
@@ -150,7 +150,7 @@ export function PromoteToVisitForm({
           value={effectiveStopId}
           onChange={(e) => setStopId(e.target.value ? Number(e.target.value) : "")}
           disabled={isPending || anchorStops.length === 0}
-          className="h-9 w-full rounded border border-dust bg-white px-2 text-sm text-ink focus:border-ink/40 outline-none"
+          className="h-9 w-full rounded border border-dust bg-white px-2 text-sm text-ink focus:border-ink/40 outline-none focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:ring-offset-1"
         >
           {anchorStops.length === 0 ? (
             <option value="">No eligible stops</option>
@@ -200,7 +200,7 @@ export function PromoteToVisitForm({
         </div>
         <div className="space-y-1">
           <Label htmlFor={`visit-date-${wishlistId}`} className="text-xs">
-            Date <span className="text-ink/40">(optional)</span>
+            Date <span className="text-ink/60">(optional)</span>
           </Label>
           <Input
             id={`visit-date-${wishlistId}`}
@@ -214,7 +214,7 @@ export function PromoteToVisitForm({
 
       <div className="space-y-1">
         <Label htmlFor={`visit-desc-${wishlistId}`} className="text-xs">
-          Description <span className="text-ink/40">(optional)</span>
+          Description <span className="text-ink/60">(optional)</span>
         </Label>
         <textarea
           id={`visit-desc-${wishlistId}`}
@@ -222,7 +222,7 @@ export function PromoteToVisitForm({
           onChange={(e) => setDescription(e.target.value)}
           disabled={isPending}
           rows={2}
-          className="w-full resize-y rounded border border-dust bg-white px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40"
+          className="w-full resize-y rounded border border-dust bg-white px-3 py-2 text-base text-ink outline-none placeholder:text-ink/40 focus:border-ink/40 focus-visible:ring-2 focus-visible:ring-ink/30 focus-visible:ring-offset-1"
         />
       </div>
 

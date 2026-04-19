@@ -17,7 +17,7 @@ export function DeleteCommentButton({ commentId }: { commentId: number }) {
           if (!result.ok) toast.error(result.error);
         });
       }}
-      className="text-xs text-ink/40 hover:text-wine disabled:opacity-50"
+      className="text-xs text-ink/60 hover:text-wine disabled:opacity-50"
     >
       {isPending ? "Deleting…" : "Delete"}
     </button>

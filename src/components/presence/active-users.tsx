@@ -14,7 +14,7 @@ export function ActiveUsers({
     .join(", ");
   return (
     <p className="mt-3 text-sm text-ink/50">
-      <span className="mr-1 inline-block h-2 w-2 rounded-full bg-olive align-middle" />
+      <span className="mr-1 inline-block h-2 w-2 rounded-full bg-olive align-middle" aria-hidden="true" />
       Also around: {names}
     </p>
   );

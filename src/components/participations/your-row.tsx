@@ -184,7 +184,7 @@ function EditForm({
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
           <Label htmlFor="p-joins" className="text-xs">
-            Join date <span className="text-ink/40">(optional)</span>
+            Join date <span className="text-ink/60">(optional)</span>
           </Label>
           <Input
             id="p-joins"
@@ -199,7 +199,7 @@ function EditForm({
         </div>
         <div className="space-y-1">
           <Label htmlFor="p-departs" className="text-xs">
-            Depart date <span className="text-ink/40">(optional)</span>
+            Depart date <span className="text-ink/60">(optional)</span>
           </Label>
           <Input
             id="p-departs"
@@ -215,7 +215,7 @@ function EditForm({
       </div>
       <div className="space-y-1">
         <Label htmlFor="p-note" className="text-xs">
-          Note <span className="text-ink/40">(optional)</span>
+          Note <span className="text-ink/60">(optional)</span>
         </Label>
         <Input
           id="p-note"
@@ -228,7 +228,7 @@ function EditForm({
           suppressHydrationWarning
         />
         {note.length > MAX_NOTE - 40 && (
-          <p className={`text-xs ${noteTooLong ? "text-wine" : "text-ink/40"}`}>
+          <p className={`text-xs ${noteTooLong ? "text-wine" : "text-ink/60"}`}>
             {note.length}/{MAX_NOTE}
           </p>
         )}

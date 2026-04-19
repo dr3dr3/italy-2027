@@ -96,7 +96,7 @@ export function VideoForm({
       </div>
       <div className="space-y-1">
         <Label htmlFor={`video-note-${stopId}`} className="text-xs">
-          Note <span className="text-ink/40">(optional)</span>
+          Note <span className="text-ink/60">(optional)</span>
         </Label>
         <Input
           id={`video-note-${stopId}`}
@@ -109,7 +109,7 @@ export function VideoForm({
         />
         {note.length > MAX_NOTE - 50 && (
           <p
-            className={`text-xs ${noteTooLong ? "text-wine" : "text-ink/40"}`}
+            className={`text-xs ${noteTooLong ? "text-wine" : "text-ink/60"}`}
           >
             {note.length}/{MAX_NOTE}
           </p>
