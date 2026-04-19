@@ -218,6 +218,35 @@ export const visits = pgTable(
   (t) => [index("visits_stop_id_idx").on(t.stopId)],
 );
 
+export const participations = pgTable(
+  "participations",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    itineraryId: bigint("itinerary_id", { mode: "number" })
+      .notNull()
+      .references(() => itineraries.id, { onDelete: "cascade" }),
+    userId: bigint("user_id", { mode: "number" })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    joinsOn: date("joins_on"),
+    departsOn: date("departs_on"),
+    note: text("note"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("participations_itinerary_user_unique").on(
+      t.itineraryId,
+      t.userId,
+    ),
+    index("participations_itinerary_id_idx").on(t.itineraryId),
+  ],
+);
+
 export const wishlistDestinations = pgTable(
   "wishlist_destinations",
   {
@@ -258,3 +287,5 @@ export type Visit = typeof visits.$inferSelect;
 export type NewVisit = typeof visits.$inferInsert;
 export type WishlistDestination = typeof wishlistDestinations.$inferSelect;
 export type NewWishlistDestination = typeof wishlistDestinations.$inferInsert;
+export type Participation = typeof participations.$inferSelect;
+export type NewParticipation = typeof participations.$inferInsert;

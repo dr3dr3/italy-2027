@@ -103,6 +103,24 @@ video itself still lives as one row attached to one stop — if that stop is
 deleted (including via re-import removing the place), the video goes with it.
 Comments and suggestions stay per-stop; only videos span.
 
+### `participations`
+Per-itinerary window for each person — when they join and depart. Absence of
+a row means "full trip". Everyone edits their own row only.
+
+| Column        | Type         | Notes                                   |
+|---------------|--------------|-----------------------------------------|
+| id            | bigserial PK |                                         |
+| itinerary_id  | bigint FK    | → itineraries.id, on delete cascade    |
+| user_id       | bigint FK    | → users.id, on delete cascade          |
+| joins_on      | date         | Null = joins at trip start              |
+| departs_on    | date         | Null = stays to trip end                |
+| note          | text         | Optional one-liner (why you're late/early) |
+| created_at    | timestamptz  |                                         |
+| updated_at    | timestamptz  |                                         |
+
+Unique index on `(itinerary_id, user_id)`. Rows where all three of `joins_on`,
+`departs_on`, and `note` are null/empty are deleted rather than stored.
+
 ## Import flow
 
 1. Ozzie sends itinerary in any format (doc, email, prose)

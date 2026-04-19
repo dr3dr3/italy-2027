@@ -50,6 +50,13 @@
       "when": 1776493265639,
       "tag": "0006_magenta_marvel_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1776570079975,
+      "tag": "0007_add_participations",
+      "breakpoints": true
     }
   ]
 }
