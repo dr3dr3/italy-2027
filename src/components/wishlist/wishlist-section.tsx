@@ -1,4 +1,4 @@
-import type { WishlistRow } from "@/lib/queries/wishlist";
+import type { PromotionItinerary, WishlistRow } from "@/lib/queries/wishlist";
 import type { CommentRow } from "@/lib/queries/comments";
 import { WishlistItem } from "./wishlist-item";
 import { WishlistForm } from "./wishlist-form";
@@ -8,11 +8,13 @@ export function WishlistSection({
   comments,
   currentUserId,
   isEditor,
+  promotionTargets,
 }: {
   rows: WishlistRow[];
   comments: Map<number, CommentRow[]>;
   currentUserId: number | null;
   isEditor: boolean;
+  promotionTargets: PromotionItinerary[];
 }) {
   return (
     <section className="mt-12">
@@ -37,6 +39,7 @@ export function WishlistSection({
               comments={comments.get(row.id) ?? []}
               currentUserId={currentUserId}
               isEditor={isEditor}
+              promotionTargets={promotionTargets}
             />
           ))}
         </ul>

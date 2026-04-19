@@ -15,7 +15,10 @@ import { ArchivedToggle } from "@/components/itineraries/archived-toggle";
 import { ActiveUsers } from "@/components/presence/active-users";
 import { getActivePresence } from "@/lib/queries/users";
 import { WishlistSection } from "@/components/wishlist/wishlist-section";
-import { getPendingWishlist } from "@/lib/queries/wishlist";
+import {
+  getPendingWishlist,
+  getPromotionTargets,
+} from "@/lib/queries/wishlist";
 import { getCommentsForPendingWishlist } from "@/lib/queries/comments";
 
 // Per-itinerary styling. Colour + dash pattern differ together so colour-blind
@@ -157,15 +160,23 @@ export default async function Home() {
   const userId = session?.user?.id ? Number(session.user.id) : null;
   const isEditor = Boolean(session?.user?.isEditor);
 
-  const [visible, overview, archived, presences, wishlist, wishlistComments] =
-    await Promise.all([
-      loadItinerariesByStatus(isEditor ? ["draft", "active"] : ["active"]),
-      loadOverviewItineraries(),
-      isEditor ? loadItinerariesByStatus(["archived"]) : Promise.resolve([]),
-      getActivePresence(),
-      getPendingWishlist(userId),
-      getCommentsForPendingWishlist(),
-    ]);
+  const [
+    visible,
+    overview,
+    archived,
+    presences,
+    wishlist,
+    wishlistComments,
+    promotionTargets,
+  ] = await Promise.all([
+    loadItinerariesByStatus(isEditor ? ["draft", "active"] : ["active"]),
+    loadOverviewItineraries(),
+    isEditor ? loadItinerariesByStatus(["archived"]) : Promise.resolve([]),
+    getActivePresence(),
+    getPendingWishlist(userId),
+    getCommentsForPendingWishlist(),
+    isEditor ? getPromotionTargets() : Promise.resolve([]),
+  ]);
 
   const visibleVoteIds = visible.map((r) => r.id);
   const archivedVoteIds = archived.map((r) => r.id);
@@ -261,6 +272,7 @@ export default async function Home() {
           comments={wishlistComments}
           currentUserId={userId}
           isEditor={isEditor}
+          promotionTargets={promotionTargets}
         />
 
         {isEditor && (

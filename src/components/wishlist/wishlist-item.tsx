@@ -1,21 +1,24 @@
-import type { WishlistRow } from "@/lib/queries/wishlist";
+import type { PromotionItinerary, WishlistRow } from "@/lib/queries/wishlist";
 import type { CommentRow } from "@/lib/queries/comments";
 import { formatRelative } from "@/lib/dates";
 import { VoteButton } from "@/components/votes/vote-button";
 import { CommentThread } from "@/components/comments/comment-thread";
 import { DeleteWishlistButton } from "./delete-wishlist-button";
 import { WishlistCommentsToggle } from "./wishlist-comments-toggle";
+import { WishlistEditorControls } from "./wishlist-editor-controls";
 
 export function WishlistItem({
   row,
   comments,
   currentUserId,
   isEditor,
+  promotionTargets,
 }: {
   row: WishlistRow;
   comments: CommentRow[];
   currentUserId: number | null;
   isEditor: boolean;
+  promotionTargets: PromotionItinerary[];
 }) {
   const canDelete =
     currentUserId !== null && (currentUserId === row.addedBy || isEditor);
@@ -54,6 +57,16 @@ export function WishlistItem({
         <span className="flex-1 truncate">
           {row.authorName ?? "Someone"} · {formatRelative(row.createdAt)}
         </span>
+        {isEditor && (
+          <WishlistEditorControls
+            wishlistId={row.id}
+            name={row.name}
+            description={row.description}
+            lat={row.lat}
+            lng={row.lng}
+            targets={promotionTargets}
+          />
+        )}
         {canDelete && <DeleteWishlistButton id={row.id} />}
       </div>
     </li>
