@@ -13,16 +13,26 @@ export function buildPeopleList(
   mates: TripMate[],
   participations: Map<number, ParticipationRow>,
 ): PersonWindow[] {
-  return mates.map((m) => {
-    const row = participations.get(m.id);
-    return {
-      userId: m.id,
-      name: m.name,
-      joinsOn: row?.joinsOn ?? null,
-      departsOn: row?.departsOn ?? null,
-      note: row?.note ?? null,
-    };
-  });
+  return mates
+    .map((m) => {
+      const row = participations.get(m.id);
+      return {
+        userId: m.id,
+        name: m.name,
+        joinsOn: row?.joinsOn ?? null,
+        departsOn: row?.departsOn ?? null,
+        note: row?.note ?? null,
+      };
+    })
+    .sort((a, b) =>
+      (a.name ?? "").localeCompare(b.name ?? "", "en", {
+        sensitivity: "base",
+      }),
+    );
+}
+
+export function isCustomWindow(p: PersonWindow): boolean {
+  return p.joinsOn !== null || p.departsOn !== null || p.note !== null;
 }
 
 export function describeWindow(p: PersonWindow): string {

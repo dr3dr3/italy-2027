@@ -32,7 +32,9 @@ import { ParticipationsSection } from "@/components/participations/participation
 import { AbsenteePill } from "@/components/participations/absentee-pill";
 import {
   getParticipationsForItinerary,
+  getRecentOtherParticipation,
   getTripMates,
+  type PrefillCandidate,
 } from "@/lib/queries/participations";
 import {
   buildPeopleList,
@@ -121,6 +123,23 @@ export default async function ItineraryPage({
   const absenteesByStop = computeAbsenteesByStop(stopRows, people);
   const tripStart = stopRows[0]?.arriveDate ?? null;
   const tripEnd = stopRows[stopRows.length - 1]?.departDate ?? null;
+
+  // Prefill the current user's edit form with their most-recent window from
+  // another itinerary — but only if they haven't set one here yet, and only
+  // if the dates fit within this trip's span.
+  let prefill: PrefillCandidate | null = null;
+  if (userId !== null && !participationRows.has(userId)) {
+    const candidate = await getRecentOtherParticipation(userId, itinerary.id);
+    if (candidate) {
+      const inSpan = (d: string | null) =>
+        d === null ||
+        ((tripStart === null || d >= tripStart) &&
+          (tripEnd === null || d <= tripEnd));
+      if (inSpan(candidate.joinsOn) && inSpan(candidate.departsOn)) {
+        prefill = candidate;
+      }
+    }
+  }
 
   const mapStops: MapStop[] = stopRows
     .filter((s): s is Stop & { lat: string; lng: string } =>
@@ -215,6 +234,7 @@ export default async function ItineraryPage({
           itineraryId={itinerary.id}
           people={people}
           currentUserId={userId}
+          prefill={prefill}
           tripStart={tripStart}
           tripEnd={tripEnd}
         />

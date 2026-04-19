@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { describeWindow, type PersonWindow } from "@/lib/participations";
+import type { PrefillCandidate } from "@/lib/queries/participations";
 import {
   deleteParticipation,
   upsertParticipation,
@@ -13,73 +14,100 @@ import {
 
 const MAX_NOTE = 200;
 
-export function ParticipationRow({
+export function YourRow({
   itineraryId,
   person,
-  isMe,
+  prefill,
   tripStart,
   tripEnd,
 }: {
   itineraryId: number;
   person: PersonWindow;
-  isMe: boolean;
+  prefill: PrefillCandidate | null;
   tripStart: string | null;
   tripEnd: string | null;
 }) {
   const [editing, setEditing] = useState(false);
 
   return (
-    <li className="px-4 py-3">
+    <div className="rounded-lg border border-dust bg-white/85 p-4">
       {editing ? (
         <EditForm
           itineraryId={itineraryId}
           person={person}
+          prefill={prefill}
           tripStart={tripStart}
           tripEnd={tripEnd}
           onClose={() => setEditing(false)}
         />
       ) : (
         <Display
+          itineraryId={itineraryId}
           person={person}
-          isMe={isMe}
           onEdit={() => setEditing(true)}
         />
       )}
-    </li>
+    </div>
   );
 }
 
 function Display({
+  itineraryId,
   person,
-  isMe,
   onEdit,
 }: {
+  itineraryId: number;
   person: PersonWindow;
-  isMe: boolean;
   onEdit: () => void;
 }) {
-  const isFullTrip = person.joinsOn === null && person.departsOn === null;
+  const hasRow =
+    person.joinsOn !== null || person.departsOn !== null || person.note !== null;
+  const [isClearing, startClearing] = useTransition();
+
+  function clear() {
+    startClearing(async () => {
+      const result = await deleteParticipation(itineraryId);
+      if (!result.ok) {
+        toast.error(result.error);
+      } else {
+        toast.success("Back to full trip.");
+      }
+    });
+  }
+
   return (
     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-      <span className="font-medium text-ink">{person.name ?? "Someone"}</span>
-      <span
-        className={`text-sm ${isFullTrip ? "text-ink/50" : "text-ink/80"}`}
-      >
+      <span className="font-medium text-ink">
+        You{person.name ? ` (${person.name})` : ""}
+      </span>
+      <span className={`text-sm ${hasRow ? "text-ink/80" : "text-ink/60"}`}>
         {describeWindow(person)}
       </span>
       {person.note && (
         <span className="text-sm text-ink/60 italic">· {person.note}</span>
       )}
-      {isMe && (
+      <span className="ml-auto flex items-center gap-1">
         <Button
           type="button"
           variant="ghost"
           onClick={onEdit}
-          className="ml-auto h-7 px-2 text-xs text-terracotta hover:text-terracotta/80"
+          disabled={isClearing}
+          className="h-7 px-2 text-xs text-terracotta hover:text-terracotta/80"
         >
           Edit
         </Button>
-      )}
+        {hasRow && (
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={clear}
+            disabled={isClearing}
+            className="h-7 px-2 text-xs text-ink/50 hover:text-ink"
+          >
+            {isClearing ? "Clearing…" : "Clear"}
+          </Button>
+        )}
+      </span>
     </div>
   );
 }
@@ -87,18 +115,29 @@ function Display({
 function EditForm({
   itineraryId,
   person,
+  prefill,
   tripStart,
   tripEnd,
   onClose,
 }: {
   itineraryId: number;
   person: PersonWindow;
+  prefill: PrefillCandidate | null;
   tripStart: string | null;
   tripEnd: string | null;
   onClose: () => void;
 }) {
-  const [joinsOn, setJoinsOn] = useState(person.joinsOn ?? "");
-  const [departsOn, setDepartsOn] = useState(person.departsOn ?? "");
+  const hasRow =
+    person.joinsOn !== null || person.departsOn !== null || person.note !== null;
+  // Prefill only fires on a fresh entry (user has no row on this trip yet).
+  const prefillActive = !hasRow && prefill !== null;
+
+  const [joinsOn, setJoinsOn] = useState(
+    person.joinsOn ?? (prefillActive ? (prefill.joinsOn ?? "") : ""),
+  );
+  const [departsOn, setDepartsOn] = useState(
+    person.departsOn ?? (prefillActive ? (prefill.departsOn ?? "") : ""),
+  );
   const [note, setNote] = useState(person.note ?? "");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -125,30 +164,23 @@ function EditForm({
     });
   }
 
-  function reset() {
-    setError(null);
-    startTransition(async () => {
-      const result = await deleteParticipation(itineraryId);
-      if (!result.ok) {
-        setError(result.error);
-        return;
-      }
-      toast.success("Back to full trip.");
-      onClose();
-    });
-  }
-
-  const hasRow =
-    person.joinsOn !== null || person.departsOn !== null || person.note !== null;
-
   return (
     <form onSubmit={submit} className="space-y-3" suppressHydrationWarning>
       <div className="flex flex-wrap items-baseline gap-3">
-        <span className="font-medium text-ink">{person.name ?? "Someone"}</span>
+        <span className="font-medium text-ink">
+          You{person.name ? ` (${person.name})` : ""}
+        </span>
         <span className="text-xs text-ink/50">
           Leave dates blank for full trip.
         </span>
       </div>
+      {prefillActive && (
+        <p className="text-xs text-ink/60">
+          Prefilled from{" "}
+          <span className="italic">{prefill.fromTitle}</span>. Adjust if
+          this trip&rsquo;s different.
+        </p>
+      )}
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1">
           <Label htmlFor="p-joins" className="text-xs">
@@ -196,45 +228,29 @@ function EditForm({
           suppressHydrationWarning
         />
         {note.length > MAX_NOTE - 40 && (
-          <p
-            className={`text-xs ${noteTooLong ? "text-wine" : "text-ink/40"}`}
-          >
+          <p className={`text-xs ${noteTooLong ? "text-wine" : "text-ink/40"}`}>
             {note.length}/{MAX_NOTE}
           </p>
         )}
       </div>
       {error && <p className="text-sm text-wine">{error}</p>}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {hasRow ? (
-          <button
-            type="button"
-            onClick={reset}
-            disabled={isPending}
-            className="text-xs text-ink/50 underline-offset-2 hover:text-ink hover:underline"
-          >
-            Reset to full trip
-          </button>
-        ) : (
-          <span />
-        )}
-        <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onClose}
-            disabled={isPending}
-            className="text-sm"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={disabled}
-            className="bg-terracotta text-cream hover:bg-terracotta/90"
-          >
-            {isPending ? "Saving…" : "Save"}
-          </Button>
-        </div>
+      <div className="flex items-center justify-end gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onClose}
+          disabled={isPending}
+          className="text-sm"
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={disabled}
+          className="bg-terracotta text-cream hover:bg-terracotta/90"
+        >
+          {isPending ? "Saving…" : "Save"}
+        </Button>
       </div>
     </form>
   );
