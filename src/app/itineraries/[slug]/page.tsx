@@ -26,7 +26,7 @@ import { getVideosForItinerary } from "@/lib/queries/videos";
 import { VisitsSection } from "@/components/visits/visits-section";
 import { getVisitsForItinerary } from "@/lib/queries/visits";
 import { ItineraryMapLoader } from "@/components/map/itinerary-map-loader";
-import type { MapStop } from "@/components/map/itinerary-map";
+import type { MapStop, MapVisit } from "@/components/map/itinerary-map";
 import { ItineraryStatusControl } from "@/components/itineraries/itinerary-status-control";
 
 type Stop = typeof stops.$inferSelect;
@@ -118,6 +118,21 @@ export default async function ItineraryPage({
       departDate: s.departDate,
     }));
 
+  const mapVisits: MapVisit[] = [];
+  for (const bucket of allVisits.values()) {
+    for (const v of [...bucket.daytrips, ...bucket.enroute]) {
+      if (v.lat === null || v.lng === null) continue;
+      mapVisits.push({
+        id: v.id,
+        name: v.name,
+        kind: v.kind,
+        lat: Number(v.lat),
+        lng: Number(v.lng),
+        visitDate: v.visitDate,
+      });
+    }
+  }
+
   return (
     <main className="min-h-screen text-ink px-6 py-12">
       <div className="mx-auto max-w-3xl">
@@ -165,7 +180,7 @@ export default async function ItineraryPage({
           </h2>
           <div className="mt-4">
             {mapStops.length > 0 ? (
-              <ItineraryMapLoader stops={mapStops} />
+              <ItineraryMapLoader stops={mapStops} visits={mapVisits} />
             ) : (
               <p className="text-sm text-ink/50">
                 Somewhere in Italy, probably.

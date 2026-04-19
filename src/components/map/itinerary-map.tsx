@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   MapContainer,
   Marker,
@@ -25,6 +25,60 @@ export type MapStop = {
   departDate: string | null;
 };
 
+export type MapVisit = {
+  id: number;
+  name: string;
+  kind: "daytrip" | "enroute";
+  lat: number;
+  lng: number;
+  visitDate: string | null;
+};
+
+// Visits only render once the viewport is roughly sub-regional. At lower
+// zoom they pile on top of the stop markers and crowd the map.
+const VISIT_MIN_ZOOM = 9;
+
+function visitIcon() {
+  return L.divIcon({
+    className: "",
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+    html: `<div style="width:14px;height:14px;border-radius:50%;background:${MAP_COLOURS.dust};border:2px solid ${MAP_COLOURS.olive};box-shadow:0 1px 2px rgba(0,0,0,0.2);"></div>`,
+  });
+}
+
+function VisitMarkers({ visits }: { visits: MapVisit[] }) {
+  const map = useMap();
+  const [zoom, setZoom] = useState<number>(map.getZoom());
+  useEffect(() => {
+    const handler = () => setZoom(map.getZoom());
+    map.on("zoomend", handler);
+    return () => {
+      map.off("zoomend", handler);
+    };
+  }, [map]);
+
+  if (zoom < VISIT_MIN_ZOOM) return null;
+  const icon = visitIcon();
+  return (
+    <>
+      {visits.map((v) => (
+        <Marker key={v.id} position={[v.lat, v.lng]} icon={icon}>
+          <Popup>
+            <div className="font-serif text-base font-semibold text-ink">
+              {v.name}
+            </div>
+            <div className="text-xs text-ink/60 mt-0.5">
+              {v.kind === "daytrip" ? "Day trip" : "Enroute"}
+              {v.visitDate && ` · ${formatDay(v.visitDate)}`}
+            </div>
+          </Popup>
+        </Marker>
+      ))}
+    </>
+  );
+}
+
 function FitBounds({ stops }: { stops: MapStop[] }) {
   const map = useMap();
   useEffect(() => {
@@ -37,9 +91,11 @@ function FitBounds({ stops }: { stops: MapStop[] }) {
 
 export default function ItineraryMap({
   stops,
+  visits = [],
   onPinClick,
 }: {
   stops: MapStop[];
+  visits?: MapVisit[];
   onPinClick?: (stopId: number) => void;
 }) {
   const ordered = [...stops].sort(
@@ -102,6 +158,7 @@ export default function ItineraryMap({
             </Popup>
           </Marker>
         ))}
+        <VisitMarkers visits={visits} />
       </MapContainer>
     </div>
   );

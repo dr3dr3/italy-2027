@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback } from "react";
-import type { MapStop } from "./itinerary-map";
+import type { MapStop, MapVisit } from "./itinerary-map";
 import { MapSkeleton } from "./map-skeleton";
 
 const ItineraryMap = dynamic(() => import("./itinerary-map"), {
@@ -10,7 +10,13 @@ const ItineraryMap = dynamic(() => import("./itinerary-map"), {
   loading: () => <MapSkeleton />,
 });
 
-export function ItineraryMapLoader({ stops }: { stops: MapStop[] }) {
+export function ItineraryMapLoader({
+  stops,
+  visits = [],
+}: {
+  stops: MapStop[];
+  visits?: MapVisit[];
+}) {
   const handlePinClick = useCallback((stopId: number) => {
     const el = document.getElementById(`stop-${stopId}`);
     if (!el) return;
@@ -19,5 +25,7 @@ export function ItineraryMapLoader({ stops }: { stops: MapStop[] }) {
     window.setTimeout(() => el.classList.remove("highlight-flash"), 1500);
   }, []);
 
-  return <ItineraryMap stops={stops} onPinClick={handlePinClick} />;
+  return (
+    <ItineraryMap stops={stops} visits={visits} onPinClick={handlePinClick} />
+  );
 }
