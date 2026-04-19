@@ -113,27 +113,29 @@ function ItineraryCard({
   isEditor: boolean;
 }) {
   return (
-    <li className="relative">
-      <Link
-        href={`/itineraries/${it.slug}`}
-        className="block rounded-lg border border-dust bg-white/85 p-6 pb-14 transition-colors hover:bg-white"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <h2 className="font-serif text-2xl font-semibold">{it.title}</h2>
-          <StatusBadge status={it.status} />
+    <li className="rounded-lg border border-dust bg-white/85 p-4 sm:p-6 transition-colors hover:bg-white">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <Link
+            href={`/itineraries/${it.slug}`}
+            className="font-serif text-2xl font-semibold hover:text-terracotta"
+          >
+            {it.title}
+          </Link>
+          <p className="mt-1 text-sm text-ink/60">
+            {it.span?.earliest && it.span?.latest ? (
+              <>
+                {formatRange(it.span.earliest, it.span.latest)} ·{" "}
+                {it.span.stopCount} stops
+              </>
+            ) : (
+              <>No stops yet.</>
+            )}
+          </p>
         </div>
-        <p className="mt-2 text-sm text-ink/60">
-          {it.span?.earliest && it.span?.latest ? (
-            <>
-              {formatRange(it.span.earliest, it.span.latest)} ·{" "}
-              {it.span.stopCount} stops
-            </>
-          ) : (
-            <>No stops yet.</>
-          )}
-        </p>
-      </Link>
-      <div className="absolute bottom-4 right-4">
+        <StatusBadge status={it.status} />
+      </div>
+      <div className="mt-3 flex items-center justify-between">
         <VoteButton
           targetType="itinerary"
           targetId={it.id}
@@ -141,15 +143,13 @@ function ItineraryCard({
           userHasVoted={vote.userHasVoted}
           label={it.title}
         />
-      </div>
-      {isEditor && (
-        <div className="absolute right-4 top-14">
+        {isEditor && (
           <ItineraryStatusControl
             itineraryId={it.id}
             status={it.status as "draft" | "active" | "archived"}
           />
-        </div>
-      )}
+        )}
+      </div>
     </li>
   );
 }
@@ -189,28 +189,28 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen text-ink px-6 py-12">
-      <div className="absolute right-6 top-6 flex items-center gap-4">
-        {isEditor && (
-          <Link
-            href="/admin/import"
-            className="text-sm text-ink/60 hover:text-terracotta"
-          >
-            Import →
-          </Link>
-        )}
-        <form action={handleSignOut}>
-          <Button
-            type="submit"
-            variant="ghost"
-            className="text-sm text-ink/70 hover:text-ink"
-          >
-            Sign out
-          </Button>
-        </form>
-      </div>
-
       <div className="mx-auto max-w-3xl">
-        <header className="mt-16 mb-12">
+        <div className="flex items-center justify-end gap-4">
+          {isEditor && (
+            <Link
+              href="/admin/import"
+              className="text-sm text-ink/60 hover:text-terracotta"
+            >
+              Import →
+            </Link>
+          )}
+          <form action={handleSignOut}>
+            <Button
+              type="submit"
+              variant="ghost"
+              className="text-sm text-ink/70 hover:text-ink"
+            >
+              Sign out
+            </Button>
+          </form>
+        </div>
+
+        <header className="mt-8 mb-12">
           <h1 className="font-serif text-4xl font-semibold">Ciao, {name}.</h1>
           <p className="mt-2 text-base text-ink/60">
             Le opzioni <span className="text-ink/40">/ the options</span>
