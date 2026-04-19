@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useMemo } from "react";
 import {
   MapContainer,
   Marker,
@@ -60,6 +60,11 @@ export default function OverviewMap({
 }: {
   itineraries: OverviewItinerary[];
 }) {
+  const icons = useMemo(
+    () => new Map(itineraries.map((it) => [it.id, labeledIcon(it.colour, it.label)])),
+    [itineraries],
+  );
+
   const firstStop = itineraries.find((it) => it.stops.length > 0)?.stops[0];
   const center: [number, number] = firstStop
     ? [firstStop.lat, firstStop.lng]
@@ -83,7 +88,7 @@ export default function OverviewMap({
             (a, b) => a.day - b.day || a.orderInDay - b.orderInDay,
           );
           const line: [number, number][] = ordered.map((s) => [s.lat, s.lng]);
-          const icon = labeledIcon(it.colour, it.label);
+          const icon = icons.get(it.id)!;
           return (
             <Fragment key={it.id}>
               {line.length > 1 && (

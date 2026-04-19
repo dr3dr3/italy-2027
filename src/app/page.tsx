@@ -107,13 +107,15 @@ function ItineraryCard({
   it,
   vote,
   isEditor,
+  style,
 }: {
   it: ListableRow;
   vote: { count: number; userHasVoted: boolean };
   isEditor: boolean;
+  style?: React.CSSProperties;
 }) {
   return (
-    <li className="rounded-lg border border-dust bg-white/85 p-4 sm:p-6 transition-colors hover:bg-white">
+    <li className="animate-in rounded-lg border border-dust bg-white/85 p-4 sm:p-6 transition-colors hover:bg-white" style={style}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <Link
@@ -190,7 +192,7 @@ export default async function Home() {
   return (
     <main className="min-h-screen text-ink px-6 py-12">
       <div className="mx-auto max-w-3xl">
-        <div className="flex items-center justify-end gap-4">
+        <div className="animate-in flex items-center justify-end gap-4">
           {isEditor && (
             <Link
               href="/admin/import"
@@ -210,7 +212,7 @@ export default async function Home() {
           </form>
         </div>
 
-        <header className="mt-8 mb-12">
+        <header className="animate-in mt-8 mb-12" style={{ animationDelay: "80ms" }}>
           <h1 className="font-serif text-4xl font-semibold">Ciao, {name}.</h1>
           <p className="mt-2 text-base text-ink/60">
             Le opzioni <span className="text-ink/50">/ what we&apos;re thinking</span>
@@ -219,7 +221,7 @@ export default async function Home() {
         </header>
 
         {overview.length > 0 && (
-          <section className="mb-12">
+          <section className="animate-in mb-12" style={{ animationDelay: "160ms" }}>
             <h2 className="font-serif text-2xl font-semibold">
               Le possibilità{" "}
               <span className="text-ink/50 text-xl font-normal">
@@ -256,12 +258,13 @@ export default async function Home() {
           </p>
         ) : (
           <ul className="space-y-4">
-            {visible.map((it) => (
+            {visible.map((it, i) => (
               <ItineraryCard
                 key={it.id}
                 it={it}
                 vote={visibleVotes.get(it.id) ?? { count: 0, userHasVoted: false }}
                 isEditor={isEditor}
+                style={{ animationDelay: `${240 + i * 80}ms` }}
               />
             ))}
           </ul>

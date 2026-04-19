@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   MapContainer,
   Marker,
@@ -38,14 +38,12 @@ export type MapVisit = {
 // zoom they pile on top of the stop markers and crowd the map.
 const VISIT_MIN_ZOOM = 9;
 
-function visitIcon() {
-  return L.divIcon({
-    className: "",
-    iconSize: [14, 14],
-    iconAnchor: [7, 7],
-    html: `<div style="width:14px;height:14px;border-radius:50%;background:${MAP_COLOURS.dust};border:2px solid ${MAP_COLOURS.olive};box-shadow:0 1px 2px rgba(0,0,0,0.2);"></div>`,
-  });
-}
+const VISIT_ICON = L.divIcon({
+  className: "",
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+  html: `<div style="width:14px;height:14px;border-radius:50%;background:${MAP_COLOURS.dust};border:2px solid ${MAP_COLOURS.olive};box-shadow:0 1px 2px rgba(0,0,0,0.2);"></div>`,
+});
 
 function VisitMarkers({ visits }: { visits: MapVisit[] }) {
   const map = useMap();
@@ -59,11 +57,10 @@ function VisitMarkers({ visits }: { visits: MapVisit[] }) {
   }, [map]);
 
   if (zoom < VISIT_MIN_ZOOM) return null;
-  const icon = visitIcon();
   return (
     <>
       {visits.map((v) => (
-        <Marker key={v.id} position={[v.lat, v.lng]} icon={icon}>
+        <Marker key={v.id} position={[v.lat, v.lng]} icon={VISIT_ICON}>
           <Popup>
             <div className="font-serif text-base font-semibold text-ink">
               {v.name}
@@ -98,10 +95,14 @@ export default function ItineraryMap({
   visits?: MapVisit[];
   onPinClick?: (stopId: number) => void;
 }) {
-  const ordered = [...stops].sort(
-    (a, b) => a.day - b.day || a.orderInDay - b.orderInDay,
+  const ordered = useMemo(
+    () => [...stops].sort((a, b) => a.day - b.day || a.orderInDay - b.orderInDay),
+    [stops],
   );
-  const line: [number, number][] = ordered.map((s) => [s.lat, s.lng]);
+  const line = useMemo<[number, number][]>(
+    () => ordered.map((s) => [s.lat, s.lng]),
+    [ordered],
+  );
 
   const center: [number, number] =
     ordered.length > 0 ? [ordered[0].lat, ordered[0].lng] : [42, 12];
