@@ -198,7 +198,7 @@ export default async function ItineraryPage({
         <section className="animate-in mb-10" style={{ animationDelay: "160ms" }}>
           <h2 className="font-serif text-2xl font-semibold">
             La mappa{" "}
-            <span className="text-ink/40 text-xl font-normal">/ the map</span>
+            <span className="text-ink/50 text-xl font-normal">/ the map</span>
           </h2>
           <div className="mt-4">
             {mapStops.length > 0 ? (
@@ -221,7 +221,7 @@ export default async function ItineraryPage({
 
         <h2 className="animate-in font-serif text-2xl font-semibold" style={{ animationDelay: "240ms" }}>
           Il piano{" "}
-          <span className="text-ink/40 text-xl font-normal">/ the plan</span>
+          <span className="text-ink/50 text-xl font-normal">/ the plan</span>
         </h2>
 
         {dayNumbers.length > 1 && (
@@ -340,7 +340,7 @@ export default async function ItineraryPage({
         <section id="discussion" className="mt-16 scroll-mt-6">
           <h2 className="font-serif text-2xl font-semibold">
             La discussione{" "}
-            <span className="text-ink/40 text-xl font-normal">
+            <span className="text-ink/50 text-xl font-normal">
               / talking points
             </span>
           </h2>

@@ -13,7 +13,7 @@ export function ActiveUsers({
     .map((p) => p.name ?? "Someone")
     .join(", ");
   return (
-    <p className="mt-2 text-sm text-ink/50">
+    <p className="mt-3 text-sm text-ink/50">
       <span className="mr-1 inline-block h-2 w-2 rounded-full bg-olive align-middle" />
       Also around: {names}
     </p>

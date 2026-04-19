@@ -20,7 +20,7 @@ export function WishlistSection({
     <section className="mt-12">
       <h2 className="font-serif text-2xl font-semibold">
         I desideri{" "}
-        <span className="text-ink/40 text-xl font-normal">/ wishlist</span>
+        <span className="text-ink/50 text-xl font-normal">/ wishlist</span>
       </h2>
       <p className="mt-1 text-sm text-ink/60">
         Ideas for places to visit. Ozzie turns them into stops or day trips.

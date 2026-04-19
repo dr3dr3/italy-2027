@@ -21,7 +21,7 @@ export function ParticipationsSection({
     >
       <h2 className="font-serif text-2xl font-semibold">
         Chi viene{" "}
-        <span className="text-ink/40 text-xl font-normal">/ who&apos;s coming</span>
+        <span className="text-ink/50 text-xl font-normal">/ who&apos;s coming</span>
       </h2>
       <ul className="mt-4 divide-y divide-dust/70 rounded-lg border border-dust bg-white/85">
         {people.map((p) => (
