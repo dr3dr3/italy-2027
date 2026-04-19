@@ -24,7 +24,7 @@ const TAGLINES: Tagline[] = [
     kind: "plain",
     text: "Ozzie's cooking. The rest of us are taste-testing.",
   },
-  { kind: "plain", text: "Reckon it'll be alright." },
+  { kind: "plain", text: "Pack light. Argue later." },
 ];
 
 export default function LoginPage() {
@@ -35,6 +35,7 @@ export default function LoginPage() {
 
   // Pick a random tagline on mount, not during render — avoids SSR/CSR hydration mismatch.
   const [tagline, setTagline] = useState<Tagline>(TAGLINES[0]);
+  const [tipOpen, setTipOpen] = useState(false);
   useEffect(() => {
     setTagline(TAGLINES[Math.floor(Math.random() * TAGLINES.length)]);
   }, []);
@@ -55,29 +56,47 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen text-ink flex items-center justify-center px-6">
+    <main className="flex min-h-screen min-h-dvh items-center justify-center px-6 text-ink">
       <div className="w-full max-w-md rounded-lg border border-dust bg-white/85 p-8 shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
         <h1 className="font-serif text-4xl font-semibold text-center">
           Italia 2027
         </h1>
-        <p className="mt-3 text-center text-sm text-ink/60">
+        <p className="mt-3 text-center text-sm text-ink/70">
           {tagline.kind === "tooltip" ? (
-            <span
-              className="underline decoration-dotted decoration-ink/40 cursor-help"
-              title={tagline.tip}
-            >
-              {tagline.text}
-            </span>
+            <>
+              <button
+                type="button"
+                onClick={() => setTipOpen((o) => !o)}
+                className="cursor-help underline decoration-dotted decoration-ink/40"
+                title={tagline.tip}
+              >
+                {tagline.text}
+              </button>
+              {tipOpen && (
+                <span className="mt-1 block text-xs text-ink/50">
+                  {tagline.tip}
+                </span>
+              )}
+            </>
           ) : (
             tagline.text
           )}
         </p>
 
         {state === "sent" ? (
-          <p className="mt-8 text-center text-base text-ink">
-            Check your email. If you&apos;re on the list, there&apos;s a link
-            waiting.
-          </p>
+          <div className="animate-in mt-8 text-center">
+            <p className="text-base text-ink">
+              Check your email. If you&apos;re on the list, there&apos;s a link
+              waiting.
+            </p>
+            <button
+              type="button"
+              onClick={() => setState("idle")}
+              className="mt-3 text-sm text-ink/60 hover:text-ink"
+            >
+              Didn&apos;t arrive? Try again
+            </button>
+          </div>
         ) : (
           <form
       onSubmit={onSubmit}
@@ -108,7 +127,8 @@ export default function LoginPage() {
             </Button>
             {state === "error" && (
               <p className="text-sm text-wine">
-                Something&apos;s gone sideways. Try again?
+                Something&apos;s gone sideways — check your address and try
+                again, or give it a minute.
               </p>
             )}
           </form>
