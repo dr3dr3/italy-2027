@@ -16,7 +16,7 @@ export function WishlistToggle({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="text-sm text-ink/60 hover:text-ink"
+        className="py-1 text-sm text-ink/60 hover:text-ink"
         aria-expanded={open}
       >
         <span className="mr-1 inline-block w-3">{open ? "▾" : "▸"}</span>

@@ -87,4 +87,7 @@ html {
   #discussion:target > h2 {
     animation: none;
   }
+  * {
+    transition-duration: 0.01ms !important;
+  }
 }

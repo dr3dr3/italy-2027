@@ -52,11 +52,11 @@ export function VoteButton({
       aria-label={label ? `Vote for ${label}` : "Vote"}
       aria-pressed={filled}
       className={[
-        "inline-flex h-8 items-center gap-1.5 rounded-full border px-2.5 text-sm transition-colors",
+        "inline-flex h-8 items-center gap-1.5 rounded-full border px-2.5 text-sm transition-all duration-200",
         filled
-          ? "border-terracotta bg-terracotta text-cream hover:bg-terracotta/90"
-          : "border-dust bg-white/85 text-ink/70 hover:border-ink/30 hover:text-ink",
-        "disabled:opacity-70",
+          ? "border-terracotta bg-terracotta text-cream hover:bg-terracotta/90 scale-105"
+          : "border-dust bg-white/85 text-ink/70 hover:border-ink/30 hover:text-ink scale-100",
+        "active:scale-95 disabled:opacity-70",
       ].join(" ")}
     >
       <Heart

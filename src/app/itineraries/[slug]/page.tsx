@@ -28,6 +28,16 @@ import { getVisitsForItinerary } from "@/lib/queries/visits";
 import { ItineraryMapLoader } from "@/components/map/itinerary-map-loader";
 import type { MapStop, MapVisit } from "@/components/map/itinerary-map";
 import { ItineraryStatusControl } from "@/components/itineraries/itinerary-status-control";
+import { ParticipationsSection } from "@/components/participations/participations-section";
+import { AbsenteePill } from "@/components/participations/absentee-pill";
+import {
+  getParticipationsForItinerary,
+  getTripMates,
+} from "@/lib/queries/participations";
+import {
+  buildPeopleList,
+  computeAbsenteesByStop,
+} from "@/lib/participations";
 
 type Stop = typeof stops.$inferSelect;
 
@@ -74,6 +84,8 @@ export default async function ItineraryPage({
     allVideos,
     itineraryComments,
     allVisits,
+    participationRows,
+    tripMates,
   ] = await Promise.all([
     db
       .select()
@@ -89,6 +101,8 @@ export default async function ItineraryPage({
     getVideosForItinerary(itinerary.id),
     getCommentsFor("itinerary", itinerary.id),
     getVisitsForItinerary(itinerary.id),
+    getParticipationsForItinerary(itinerary.id),
+    getTripMates(),
   ]);
 
   // Next-stop lookup for enroute visit headings ("on the drive to X").
@@ -102,6 +116,11 @@ export default async function ItineraryPage({
 
   const days = groupByDay(stopRows);
   const dayNumbers = [...days.keys()].sort((a, b) => a - b);
+
+  const people = buildPeopleList(tripMates, participationRows);
+  const absenteesByStop = computeAbsenteesByStop(stopRows, people);
+  const tripStart = stopRows[0]?.arriveDate ?? null;
+  const tripEnd = stopRows[stopRows.length - 1]?.departDate ?? null;
 
   const mapStops: MapStop[] = stopRows
     .filter((s): s is Stop & { lat: string; lng: string } =>
@@ -192,6 +211,14 @@ export default async function ItineraryPage({
           </div>
         </section>
 
+        <ParticipationsSection
+          itineraryId={itinerary.id}
+          people={people}
+          currentUserId={userId}
+          tripStart={tripStart}
+          tripEnd={tripEnd}
+        />
+
         <h2 className="animate-in font-serif text-2xl font-semibold" style={{ animationDelay: "240ms" }}>
           Il piano{" "}
           <span className="text-ink/40 text-xl font-normal">/ the plan</span>
@@ -219,7 +246,7 @@ export default async function ItineraryPage({
               <li
                 key={day}
                 id={`day-${day}`}
-                className="animate-in scroll-mt-6"
+                className="animate-in scroll-mt-16 sm:scroll-mt-6"
                 style={{ animationDelay: `${360 + i * 80}ms` }}
               >
                 <h3 className="font-serif text-2xl font-semibold">
@@ -241,7 +268,7 @@ export default async function ItineraryPage({
                       <div
                         key={s.id}
                         id={`stop-${s.id}`}
-                        className="rounded-lg border border-dust bg-white/85 p-5 scroll-mt-6"
+                        className="rounded-lg border border-dust bg-white/85 p-4 sm:p-5 scroll-mt-16 sm:scroll-mt-6"
                       >
                         <div className="flex items-start justify-between gap-4">
                           <div>
@@ -267,6 +294,7 @@ export default async function ItineraryPage({
                             {s.description}
                           </p>
                         )}
+                        <AbsenteePill absentees={absenteesByStop.get(s.id) ?? []} />
                         <VideosSection
                           stopId={s.id}
                           videos={allVideos.get(s.id) ?? []}
