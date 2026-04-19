@@ -51,3 +51,40 @@ body {
 #discussion:target > h2 {
   animation: discussion-arrive 1400ms ease-out;
 }
+
+/* Page-load entrance — staggered fade-up */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fade-up 500ms cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+/* Smooth scroll for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-in {
+    animation: none;
+    opacity: 1;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  .highlight-flash {
+    animation: none;
+  }
+  #discussion:target > h2 {
+    animation: none;
+  }
+}

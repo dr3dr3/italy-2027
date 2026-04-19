@@ -138,12 +138,15 @@ export default async function ItineraryPage({
       <div className="mx-auto max-w-3xl">
         <Link
           href="/"
-          className="text-sm text-ink/60 hover:text-ink"
+          className="animate-in text-sm text-ink/60 hover:text-ink"
         >
           ← Le opzioni <span className="text-ink/40">/ back</span>
         </Link>
 
-        <header className="mt-6 mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <header
+          className="animate-in mt-6 mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
+          style={{ animationDelay: "80ms" }}
+        >
           <h1 className="font-serif text-4xl font-semibold">
             {itinerary.title}
           </h1>
@@ -173,7 +176,7 @@ export default async function ItineraryPage({
           </div>
         </header>
 
-        <section className="mb-10">
+        <section className="animate-in mb-10" style={{ animationDelay: "160ms" }}>
           <h2 className="font-serif text-2xl font-semibold">
             La mappa{" "}
             <span className="text-ink/40 text-xl font-normal">/ the map</span>
@@ -189,13 +192,13 @@ export default async function ItineraryPage({
           </div>
         </section>
 
-        <h2 className="font-serif text-2xl font-semibold">
+        <h2 className="animate-in font-serif text-2xl font-semibold" style={{ animationDelay: "240ms" }}>
           Il piano{" "}
           <span className="text-ink/40 text-xl font-normal">/ the plan</span>
         </h2>
 
         {dayNumbers.length > 1 && (
-          <nav className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-sm text-ink/60">
+          <nav className="animate-in mt-3 flex flex-wrap gap-x-3 gap-y-1 text-sm text-ink/60" style={{ animationDelay: "300ms" }}>
             {dayNumbers.map((day) => (
               <a
                 key={day}
@@ -209,11 +212,16 @@ export default async function ItineraryPage({
         )}
 
         <ol className="mt-6 space-y-8">
-          {dayNumbers.map((day) => {
+          {dayNumbers.map((day, i) => {
             const dayStops = days.get(day)!;
             const firstArrive = dayStops[0].arriveDate;
             return (
-              <li key={day} id={`day-${day}`} className="scroll-mt-6">
+              <li
+                key={day}
+                id={`day-${day}`}
+                className="animate-in scroll-mt-6"
+                style={{ animationDelay: `${360 + i * 80}ms` }}
+              >
                 <h3 className="font-serif text-2xl font-semibold">
                   Day {day}
                   {firstArrive && (
