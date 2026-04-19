@@ -213,7 +213,7 @@ export default async function Home() {
         <header className="mt-8 mb-12">
           <h1 className="font-serif text-4xl font-semibold">Ciao, {name}.</h1>
           <p className="mt-2 text-base text-ink/60">
-            Le opzioni <span className="text-ink/40">/ the options</span>
+            Le opzioni <span className="text-ink/40">/ what we&apos;re thinking</span>
           </p>
           <ActiveUsers presences={presences} currentUserId={userId} />
         </header>
@@ -223,7 +223,7 @@ export default async function Home() {
             <h2 className="font-serif text-2xl font-semibold">
               Le possibilità{" "}
               <span className="text-ink/40 text-xl font-normal">
-                / the options
+                / at a glance
               </span>
             </h2>
             <div className="mt-4">
