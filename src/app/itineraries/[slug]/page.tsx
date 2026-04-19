@@ -23,6 +23,8 @@ import { SuggestionsSection } from "@/components/suggestions/suggestions-section
 import { getSuggestionsForItinerary } from "@/lib/queries/suggestions";
 import { VideosSection } from "@/components/videos/videos-section";
 import { getVideosForItinerary } from "@/lib/queries/videos";
+import { VisitsSection } from "@/components/visits/visits-section";
+import { getVisitsForItinerary } from "@/lib/queries/visits";
 import { ItineraryMapLoader } from "@/components/map/itinerary-map-loader";
 import type { MapStop } from "@/components/map/itinerary-map";
 import { ItineraryStatusControl } from "@/components/itineraries/itinerary-status-control";
@@ -71,6 +73,7 @@ export default async function ItineraryPage({
     allSuggestions,
     allVideos,
     itineraryComments,
+    allVisits,
   ] = await Promise.all([
     db
       .select()
@@ -85,7 +88,17 @@ export default async function ItineraryPage({
     getSuggestionsForItinerary(itinerary.id, userId),
     getVideosForItinerary(itinerary.id),
     getCommentsFor("itinerary", itinerary.id),
+    getVisitsForItinerary(itinerary.id),
   ]);
+
+  // Next-stop lookup for enroute visit headings ("on the drive to X").
+  // stopRows is already ordered by (day, order_in_day); the last row has no
+  // next, so enroute visits there are either missing (blocked by validation)
+  // or render with a generic heading.
+  const nextStopName = new Map<number, string>();
+  for (let i = 0; i < stopRows.length - 1; i++) {
+    nextStopName.set(stopRows[i].id, stopRows[i + 1].name);
+  }
 
   const days = groupByDay(stopRows);
   const dayNumbers = [...days.keys()].sort((a, b) => a - b);
@@ -242,6 +255,16 @@ export default async function ItineraryPage({
                           suggestions={allSuggestions.get(s.id) ?? []}
                           suggestionComments={suggestionComments}
                           currentUserId={userId}
+                          isEditor={isEditor}
+                        />
+                        <VisitsSection
+                          visits={
+                            allVisits.get(s.id) ?? {
+                              daytrips: [],
+                              enroute: [],
+                            }
+                          }
+                          nextStopName={nextStopName.get(s.id) ?? null}
                           isEditor={isEditor}
                         />
                         <StopCommentsToggle
