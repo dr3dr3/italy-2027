@@ -15,6 +15,7 @@ import { ArchivedToggle } from "@/components/itineraries/archived-toggle";
 import { ActiveUsers } from "@/components/presence/active-users";
 import { getActivePresence } from "@/lib/queries/users";
 import { WishlistSection } from "@/components/wishlist/wishlist-section";
+import { PhraseOfTheDay } from "@/components/phrase-of-the-day";
 import {
   getPendingWishlist,
   getPromotionTargets,
@@ -219,6 +220,8 @@ export default async function Home() {
           </p>
           <ActiveUsers presences={presences} currentUserId={userId} />
         </header>
+
+        <PhraseOfTheDay />
 
         {overview.length > 0 && (
           <section className="animate-in mb-12" style={{ animationDelay: "160ms" }}>
