@@ -13,7 +13,7 @@ type Tagline =
 const TAGLINES: Tagline[] = [
   {
     kind: "plain",
-    text: "Six mates, one itinerary, zero chance of consensus.",
+    text: "A few mates, one itinerary, zero chance of consensus.",
   },
   {
     kind: "tooltip",

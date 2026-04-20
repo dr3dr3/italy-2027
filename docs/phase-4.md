@@ -153,7 +153,7 @@ that would crowd the view, so:
   filled pin, or a different shape. Same palette (terracotta / olive /
   etc.) so the itinerary colour still reads.
 
-No clustering. Six friends will never produce enough visits to need it,
+No clustering. A small group will never produce enough visits to need it,
 and the cluster icons add noise. If we're wrong about volume, revisit.
 
 Nice-to-have, not required for v1 of the map:

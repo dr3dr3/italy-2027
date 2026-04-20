@@ -1,14 +1,14 @@
 # Claude Code brief — italy-2027
 
-You are helping build a small collaborative trip planner for a group of six friends
+You are helping build a small collaborative trip planner for a group of friends
 going to Italy in 2027. This is a side project, not a product. Optimise for **simple,
 fun, and done**, not for scale, reusability, or enterprise patterns.
 
 ## Who this is for
 
-Six people, all known, all seeded directly in the database. No public signup.
-One of them (Ozzie) is the editor and owns the canonical itineraries. The other
-five collaborate via comments, votes, suggestions, and shared videos.
+A small group, all known, all seeded directly in the database. No public signup.
+Ozzie is the editor and owns the canonical itineraries. Everyone else
+collaborates via comments, votes, suggestions, and shared videos.
 
 ## Stack — do not deviate without asking
 
@@ -39,7 +39,7 @@ See [`docs/data-model.md`](./docs/data-model.md) for the full schema. Key points
 We're building in phases. Don't jump ahead.
 
 - **Phase 1 — skeleton**: Next.js scaffold, Neon connected, Auth.js magic links working,
-  6 users seeded, one itinerary hardcoded from JSON, list + detail views, no collaboration yet.
+  users seeded, one itinerary hardcoded from JSON, list + detail views, no collaboration yet.
 - **Phase 2 — collaboration**: comments, votes, suggestions with thumbs-ups and confirm,
   YouTube embeds.
 - **Phase 3 — map + polish**: Leaflet map per itinerary, multi-itinerary support with

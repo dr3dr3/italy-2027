@@ -107,7 +107,7 @@ Moderate. Half a day. Good candidate for Phase 4 if it ever lands.
 
 ### B3. Arrival board — who lands when
 
-Six friends flying in from different cities on different days. A small table
+Friends flying in from different cities on different days. A small table
 at the top of the itinerary: name, arrival date, arrival time, airport,
 flight number. Editor doesn't need to own this — anyone can fill in their
 own row. Could reuse the `users` table with an arrival-info sub-table keyed
@@ -154,7 +154,7 @@ suggestions) become nearly useless here. New ones take over.
 offline? Italian rural data is fine but patchy. If yes, a lot of what
 follows needs service-worker caching baked in. If no, we can be more relaxed
 and lean on "you'll have wifi at the Airbnb anyway". Probably the honest
-answer for six people is: nice-to-have, not must-have.
+answer for a small group is: nice-to-have, not must-have.
 
 ### C1. "Today" view
 
@@ -198,7 +198,7 @@ maintain a YouTube upload per dinner.
 Options, cheapest to heaviest:
 
 - **Link-only** — paste a Google Photos / iCloud Shared Album URL per stop.
-  Zero infra. Probably the right answer for six people.
+  Zero infra. Probably the right answer for a small group.
 - **Uploads to an S3-compatible bucket** — real but real work: storage,
   thumbnails, lifecycle, auth. Weeks, not days. Not worth it for us.
 
@@ -261,8 +261,8 @@ that's fine.
 - AI trip suggestions / "Claude plans your day" — not the vibe of this
   project; Ozzie plans, friends react
 - Booking integrations (Booking.com, Skyscanner APIs) — massive effort,
-  tiny payoff, six people can paste URLs
-- Public sharing, SEO, a marketing site — six-person trip, not a product
+  tiny payoff, we can paste URLs
+- Public sharing, SEO, a marketing site — private trip, not a product
 - Native mobile app — PWA with `Add to Home Screen` covers 95% of it for
   free
 

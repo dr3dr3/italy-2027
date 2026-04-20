@@ -53,7 +53,7 @@ queries in `src/lib/queries/videos.ts`.
 migration to dedupe existing stops into places, rewrite every video query,
 and we have to decide at the same time whether comments and suggestions
 should also span itineraries (they're polymorphic on `stop`, so the same
-question bites them). Probably a day-plus and lots of churn for six users.
+question bites them). Probably a day-plus and lots of churn for a handful of users.
 
 ### Recommendation
 

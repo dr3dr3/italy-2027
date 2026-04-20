@@ -1,6 +1,6 @@
 # italy-2027
 
-A small collaborative trip planner for six mates going to Italy in 2027.
+A small collaborative trip planner for a few mates going to Italy in 2027.
 Ozzie plans, the rest of us chime in. Built as a side project, kept deliberately simple.
 
 Not a product. Not reusable. Just for this trip.
