@@ -93,7 +93,9 @@ export function drawPassport(
     const cy = rng() * h;
     const rot = range(rng, -0.35, 0.35);
     const ink = pick(rng, inkTones);
-    const alpha = range(rng, 0.35, 0.8);
+    // Faded range keeps stamps legible on their own but lets overlaid
+    // app text stay readable where the two intersect.
+    const alpha = range(rng, 0.22, 0.5);
     const shape = rng();
     const city = pick(rng, CITIES);
     const date = stampDate(rng);

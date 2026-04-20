@@ -1,18 +1,15 @@
 // The single knob. URL params override at runtime for quick A/B:
 //   ?bg=<variant> | off
 //   ?seed=<integer>
-// Users also cycle variants via the `B` easter-egg keyboard shortcut;
-// that choice persists via localStorage (see GenerativeBackground).
+// Users also cycle variants via the `B` easter-egg keyboard shortcut on
+// desktop or a triple-tap on mobile; that choice persists via localStorage
+// (see GenerativeBackground).
 export const BACKGROUND_VARIANTS = [
   "terrazzo",
   "vineyard",
   "passport",
   "polaroid",
   "tuscan",
-  "morph-embers",
-  "morph-adriatic",
-  "morph-quartz",
-  "morph-osteria",
 ] as const;
 
 export type BackgroundVariant = (typeof BACKGROUND_VARIANTS)[number];

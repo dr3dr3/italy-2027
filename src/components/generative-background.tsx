@@ -13,7 +13,6 @@ import { drawVineyard } from "@/lib/background/vineyard";
 import { drawPassport } from "@/lib/background/passport";
 import { drawPolaroid } from "@/lib/background/polaroid";
 import { drawTuscan } from "@/lib/background/tuscan";
-import { drawMorphTiles } from "@/lib/background/morph-tiles";
 import { resolvePalette } from "@/lib/background/palette";
 import { randomSeed } from "@/lib/background/rng";
 
@@ -46,10 +45,6 @@ function draw(variant: BackgroundVariant, width: number, height: number, seed: n
     case "passport":       drawPassport(ctx, width, height, seed, palette); break;
     case "polaroid":       drawPolaroid(ctx, width, height, seed, palette); break;
     case "tuscan":         drawTuscan(ctx, width, height, seed, palette); break;
-    case "morph-embers":   drawMorphTiles(ctx, width, height, seed, palette, "embers"); break;
-    case "morph-adriatic": drawMorphTiles(ctx, width, height, seed, palette, "adriatic"); break;
-    case "morph-quartz":   drawMorphTiles(ctx, width, height, seed, palette, "quartz"); break;
-    case "morph-osteria":  drawMorphTiles(ctx, width, height, seed, palette, "osteria"); break;
   }
 
   try {

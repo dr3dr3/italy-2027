@@ -15,13 +15,14 @@ export function drawTerrazzo(
   ctx.fillStyle = palette.warmCream;
   ctx.fillRect(0, 0, w, h);
 
+  // Wine and heavy ink are intentionally dropped — they read as dark
+  // splotches that distract from overlaid content.
   const chipColours = [
     palette.terracotta,
     palette.olive,
     palette.sienna,
     palette.ochre,
     palette.dust,
-    palette.wine,
     palette.cream,
   ] as const;
 
@@ -47,11 +48,11 @@ export function drawTerrazzo(
     }
     ctx.closePath();
 
-    ctx.globalAlpha = range(rng, 0.55, 0.85);
+    ctx.globalAlpha = range(rng, 0.4, 0.65);
     ctx.fillStyle = colour;
     ctx.fill();
 
-    ctx.globalAlpha = 0.12;
+    ctx.globalAlpha = 0.06;
     ctx.strokeStyle = palette.ink;
     ctx.lineWidth = 0.5;
     ctx.stroke();
@@ -70,7 +71,7 @@ export function drawTerrazzo(
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(rot);
-    ctx.globalAlpha = range(rng, 0.35, 0.6);
+    ctx.globalAlpha = range(rng, 0.25, 0.45);
     ctx.fillStyle = colour;
     ctx.beginPath();
     ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
@@ -79,9 +80,9 @@ export function drawTerrazzo(
   }
 
   // Fine speckles, ink dots.
-  ctx.globalAlpha = 0.12;
+  ctx.globalAlpha = 0.07;
   ctx.fillStyle = palette.ink;
-  const speckleCount = Math.round((w * h) / 900);
+  const speckleCount = Math.round((w * h) / 1800);
   for (let i = 0; i < speckleCount; i++) {
     const x = rng() * w;
     const y = rng() * h;

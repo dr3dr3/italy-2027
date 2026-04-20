@@ -48,10 +48,11 @@ export function drawTuscan(
     const freq = 1 / (180 + 60 * t);
     const phase = i * 991 + (seed % 997);
 
-    // Greens: olive darkened toward ink as layers move forward.
-    const darken = 0.15 + 0.55 * t;
+    // Greens: olive lightly darkened as layers move forward. Cap the
+    // progression so the foreground stays readable rather than near-black.
+    const darken = 0.05 + 0.28 * t;
     const layerColour = mixColor(palette.olive, palette.ink, darken);
-    const cypressColour = mixColor(layerColour, palette.ink, 0.45);
+    const cypressColour = mixColor(layerColour, palette.ink, 0.28);
 
     const sampleHillY = (x: number) => {
       const n = noise((x + phase) * freq, i * 1.7);
@@ -69,15 +70,6 @@ export function drawTuscan(
     ctx.lineTo(w, h);
     ctx.closePath();
     ctx.fill();
-
-    // Atmospheric haze — lighten the join on back layers only.
-    if (i <= 1) {
-      ctx.save();
-      ctx.globalAlpha = 0.18 * (1 - i * 0.4);
-      ctx.fillStyle = palette.parchment;
-      ctx.fillRect(0, baseY - amp, w, 50);
-      ctx.restore();
-    }
 
     // Cypresses — 2-5 per layer, placed on the hill contour.
     const cypressCount = 2 + Math.floor(rng() * 4);

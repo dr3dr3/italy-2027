@@ -22,20 +22,22 @@ export function drawPolaroid(
 ): void {
   const rng = mulberry32(seed);
 
-  // Corkboard — ink shifted slightly toward sienna for warmth.
-  const board = mixColor(palette.ink, palette.sienna, 0.08);
+  // Light sandstone corkboard — dust warmed slightly with sienna. Keeps
+  // the photos reading as the focal point and harmonises with cream/
+  // parchment elsewhere in the design system.
+  const board = mixColor(palette.dust, palette.sienna, 0.1);
   ctx.fillStyle = board;
   ctx.fillRect(0, 0, w, h);
 
-  // Noise texture — warm grain (sienna) and cool grain (warmCream).
-  const grainCount = Math.round((w * h) / 400);
-  ctx.globalAlpha = 0.08;
+  // Noise texture — subtle warm grain for the cork feel.
+  const grainCount = Math.round((w * h) / 500);
+  ctx.globalAlpha = 0.1;
   ctx.fillStyle = palette.sienna;
   for (let i = 0; i < grainCount; i++) {
     ctx.fillRect(rng() * w, rng() * h, 1, 1);
   }
-  ctx.globalAlpha = 0.04;
-  ctx.fillStyle = palette.warmCream;
+  ctx.globalAlpha = 0.06;
+  ctx.fillStyle = palette.ochre;
   for (let i = 0; i < grainCount / 2; i++) {
     ctx.fillRect(rng() * w, rng() * h, 1, 1);
   }
@@ -76,8 +78,8 @@ export function drawPolaroid(
     ctx.translate(cx, cy);
     ctx.rotate(rot);
 
-    // Shadow.
-    ctx.globalAlpha = 0.45;
+    // Shadow — softer against the light board than against dark ink.
+    ctx.globalAlpha = 0.22;
     ctx.fillStyle = "#000";
     ctx.fillRect(-frameW / 2 + 5, -frameH / 2 + 7, frameW, frameH);
 

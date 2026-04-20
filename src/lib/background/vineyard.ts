@@ -124,9 +124,10 @@ export function drawVineyard(
   const placed: Array<{ x: number; y: number }> = [];
   const minDist = Math.min(w, h) * 0.22;
 
+  // Labels in olive at low alpha — soft enough that overlaid app text
+  // stays readable even when it crosses a village name.
   ctx.font = "italic 13px 'Fraunces', 'Georgia', serif";
-  ctx.fillStyle = palette.ink;
-  ctx.globalAlpha = 0.55;
+  ctx.fillStyle = palette.olive;
   ctx.textBaseline = "middle";
 
   const used = new Set<string>();
@@ -147,12 +148,11 @@ export function drawVineyard(
     placed.push({ x, y });
     used.add(name);
 
-    // Tiny dot marker + name to the right.
-    ctx.globalAlpha = 0.5;
+    ctx.globalAlpha = 0.3;
     ctx.beginPath();
     ctx.arc(x, y, 1.8, 0, Math.PI * 2);
     ctx.fill();
-    ctx.globalAlpha = 0.6;
+    ctx.globalAlpha = 0.35;
     ctx.fillText(name, x + 6, y);
   }
 
