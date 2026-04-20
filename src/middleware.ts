@@ -1,14 +1,27 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 
+// Public paths that must be reachable without auth — the service worker,
+// manifest, and PWA icons are fetched by the browser itself and cannot follow
+// a redirect to /login.
+const PUBLIC_PATHS = new Set([
+  "/sw.js",
+  "/manifest.webmanifest",
+  "/icon1",
+  "/icon2",
+  "/apple-icon",
+  "/offline",
+]);
+
 export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = Boolean(req.auth);
 
   const isLoginPage = nextUrl.pathname === "/login";
   const isAuthApi = nextUrl.pathname.startsWith("/api/auth");
+  const isPublic = PUBLIC_PATHS.has(nextUrl.pathname);
 
-  if (isAuthApi) return NextResponse.next();
+  if (isAuthApi || isPublic) return NextResponse.next();
 
   if (isLoginPage) {
     if (isLoggedIn) {

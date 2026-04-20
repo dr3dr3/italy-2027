@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createSuggestion } from "@/lib/actions/suggestions";
+import { useOnline } from "@/hooks/use-online";
 
 const KINDS = [
   { value: "attraction", label: "Attraction" },
@@ -24,6 +25,7 @@ export function SuggestionForm({ stopId }: { stopId: number }) {
   const [url, setUrl] = useState("");
   const [notes, setNotes] = useState("");
   const [isPending, startTransition] = useTransition();
+  const online = useOnline();
 
   function reset() {
     setKind("attraction");
@@ -79,7 +81,8 @@ export function SuggestionForm({ stopId }: { stopId: number }) {
     isPending ||
     title.trim().length === 0 ||
     titleTooLong ||
-    notesTooLong;
+    notesTooLong ||
+    !online;
 
   return (
     <form

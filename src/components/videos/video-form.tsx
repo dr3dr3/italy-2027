@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { extractYouTubeId } from "@/lib/youtube";
 import { createVideo } from "@/lib/actions/videos";
+import { useOnline } from "@/hooks/use-online";
 
 const MAX_NOTE = 500;
 
@@ -21,6 +22,7 @@ export function VideoForm({
   const [url, setUrl] = useState("");
   const [note, setNote] = useState("");
   const [isPending, startTransition] = useTransition();
+  const online = useOnline();
 
   function close() {
     setUrl("");
@@ -32,7 +34,7 @@ export function VideoForm({
   const validId = trimmedUrl.length > 0 ? extractYouTubeId(trimmedUrl) : null;
   const urlInvalid = trimmedUrl.length > 0 && validId === null;
   const noteTooLong = note.length > MAX_NOTE;
-  const disabled = isPending || !validId || noteTooLong;
+  const disabled = isPending || !validId || noteTooLong || !online;
 
   const [error, setError] = useState<string | null>(null);
 

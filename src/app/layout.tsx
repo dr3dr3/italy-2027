@@ -1,8 +1,10 @@
 // kolay gelsin
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bitter, Source_Sans_3 } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { GenerativeBackground } from "@/components/generative-background";
+import { RegisterSw } from "@/components/pwa/register-sw";
+import { OfflineBanner } from "@/components/pwa/offline-banner";
 import "./globals.css";
 
 const bitter = Bitter({
@@ -20,6 +22,17 @@ const sourceSans = Source_Sans_3({
 export const metadata: Metadata = {
   title: "Italia 2027",
   description: "A few friends, one trip.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Italia 2027",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#c65d3a",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -32,9 +45,11 @@ export default function RootLayout({
       <body
         className={`${bitter.variable} ${sourceSans.variable} bg-cream text-ink antialiased`}
       >
+        <OfflineBanner />
         <GenerativeBackground />
         {children}
         <Toaster />
+        <RegisterSw />
       </body>
     </html>
   );

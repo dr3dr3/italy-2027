@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { createComment } from "@/lib/actions/comments";
 import type { CommentTargetType } from "@/lib/queries/comments";
+import { useOnline } from "@/hooks/use-online";
 
 const MAX_BODY = 2000;
 
@@ -17,10 +18,11 @@ export function CommentForm({
 }) {
   const [body, setBody] = useState("");
   const [isPending, startTransition] = useTransition();
+  const online = useOnline();
 
   const trimmed = body.trim();
   const tooLong = trimmed.length > MAX_BODY;
-  const disabled = isPending || trimmed.length === 0 || tooLong;
+  const disabled = isPending || trimmed.length === 0 || tooLong || !online;
 
   const [error, setError] = useState<string | null>(null);
 
