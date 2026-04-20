@@ -20,6 +20,16 @@ export default async function AdminImportPage() {
             matching existing itineraries get replaced wholesale including
             stops. New slugs create new itineraries.
           </p>
+          <p className="mt-3 text-sm text-ink/60">
+            Starting from scratch?{" "}
+            <Link
+              href="/admin/prompt-generator"
+              className="underline decoration-dust underline-offset-4 hover:decoration-terracotta"
+            >
+              Generate a prompt
+            </Link>{" "}
+            to draft one with an AI.
+          </p>
         </header>
         <ItineraryImport />
       </div>
