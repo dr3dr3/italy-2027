@@ -32,21 +32,22 @@ export function ParticipationsSection({
 
   return (
     <section className="animate-in mb-10" style={{ animationDelay: "200ms" }}>
-      <div className="flex flex-wrap items-baseline gap-x-3">
-        <h2 className="font-serif text-2xl font-semibold">
-          Chi viene{" "}
-          <span className="text-ink/50 text-xl font-normal">
-            / who&apos;s coming
-          </span>
-        </h2>
-        {allFullTrip && (
-          <p className="text-sm text-ink/50 italic">
-            Tutti a bordo. Change yours below if it&rsquo;s not.
-          </p>
-        )}
+      <div className="flex items-baseline gap-3">
+        <p className="text-[10px] uppercase tracking-[0.22em] text-ink/45">
+          Chi viene
+        </p>
+        <span className="text-ink/25" aria-hidden="true">·</span>
+        <p className="font-serif text-base italic text-ink/60">
+          who&apos;s coming
+        </p>
       </div>
+      {allFullTrip && (
+        <p className="mt-2 font-serif text-sm italic text-ink/55">
+          Tutti a bordo. Change yours below if it&rsquo;s not.
+        </p>
+      )}
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-5 space-y-3">
         {you && (
           <YourRow
             itineraryId={itineraryId}
