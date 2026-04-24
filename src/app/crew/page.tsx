@@ -26,6 +26,17 @@ function initials(name: string | null): string {
   return (parts[0]?.[0] ?? "?").toUpperCase();
 }
 
+const AVATAR_COLORS = [
+  "bg-terracotta",
+  "bg-olive",
+  "bg-wine",
+  "bg-ink",
+] as const;
+
+function avatarColor(id: number): string {
+  return AVATAR_COLORS[id % AVATAR_COLORS.length];
+}
+
 function CrewCard({
   member,
   isMe,
@@ -44,7 +55,7 @@ function CrewCard({
       <div className="flex items-center gap-4">
         <div
           aria-hidden="true"
-          className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-dust font-serif text-base font-semibold text-ink/70"
+          className={`flex h-10 w-10 flex-none items-center justify-center rounded-full font-serif text-base font-semibold text-cream ${avatarColor(member.id)}`}
         >
           {initials(member.name)}
         </div>
