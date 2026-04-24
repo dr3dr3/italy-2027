@@ -2,14 +2,15 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 
 // Public paths that must be reachable without auth — the service worker,
-// manifest, and PWA icons are fetched by the browser itself and cannot follow
-// a redirect to /login.
+// manifest, PWA icons, and the Open Graph image are fetched by clients
+// (browsers, link-preview crawlers) that cannot follow a redirect to /login.
 const PUBLIC_PATHS = new Set([
   "/sw.js",
   "/manifest.webmanifest",
   "/icon1",
   "/icon2",
   "/apple-icon",
+  "/opengraph-image",
   "/offline",
 ]);
 

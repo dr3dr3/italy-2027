@@ -20,8 +20,19 @@ const sourceSans = Source_Sans_3({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://italia-2027.vercel.app"),
   title: "Italia 2027",
   description: "A few friends, one trip.",
+  openGraph: {
+    title: "Italia 2027",
+    description: "A few friends, one trip.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Italia 2027",
+    description: "A few friends, one trip.",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
