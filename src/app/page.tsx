@@ -194,6 +194,12 @@ export default async function Home() {
     <main className="min-h-screen text-ink px-6 py-12">
       <div className="mx-auto max-w-3xl">
         <div className="animate-in flex items-center justify-end gap-4">
+          <Link
+            href="/crew"
+            className="text-sm text-ink/60 hover:text-terracotta"
+          >
+            Crew →
+          </Link>
           {isEditor && (
             <Link
               href="/admin/import"
