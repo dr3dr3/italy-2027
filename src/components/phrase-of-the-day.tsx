@@ -34,17 +34,14 @@ function dayOfYearUTC(date: Date): number {
 export function PhraseOfTheDay() {
   const phrase = PHRASES[dayOfYearUTC(new Date()) % PHRASES.length];
   return (
-    <section className="animate-in mb-10" style={{ animationDelay: "120ms" }}>
-      <p className="text-[10px] uppercase tracking-wider text-ink/40 font-medium">
+    <div className="border-t border-ink/15 pt-3">
+      <p className="text-[10px] uppercase tracking-[0.18em] text-ink/45 font-medium">
         Frase del giorno
       </p>
-      <p className="mt-1 flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-2">
-        <span className="font-serif italic text-lg text-ink">{phrase.it}</span>
-        <span className="text-sm text-ink/55">
-          <span className="hidden sm:inline">— </span>
-          {phrase.en}
-        </span>
+      <p className="mt-2 font-serif italic text-xl leading-snug text-ink">
+        &ldquo;{phrase.it}&rdquo;
       </p>
-    </section>
+      <p className="mt-1.5 text-sm text-ink/60">&mdash; {phrase.en}</p>
+    </div>
   );
 }

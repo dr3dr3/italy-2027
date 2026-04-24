@@ -3,7 +3,6 @@ import { desc, inArray, min, max, count } from "drizzle-orm";
 import { auth, signOut } from "@/auth";
 import { db, itineraries, stops } from "@/db";
 import { Button } from "@/components/ui/button";
-import { StatusBadge } from "@/components/status-badge";
 import { formatRange } from "@/lib/dates";
 import { VoteButton } from "@/components/votes/vote-button";
 import { getItineraryVoteSummariesForUser } from "@/lib/queries/votes";
@@ -32,6 +31,7 @@ const OVERVIEW_STYLES = [
   { colour: "#1a1a1a", dashArray: undefined as string | undefined },
 ] as const;
 const LABELS = ["A", "B", "C", "D"] as const;
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
 
 async function handleSignOut() {
   "use server";
@@ -104,54 +104,103 @@ async function loadItinerariesByStatus(statuses: Array<"draft" | "active" | "arc
   return rows.map((r) => ({ ...r, span: byId.get(r.id) }));
 }
 
-function ItineraryCard({
+// Days-until-departure for the masthead. Uses the earliest `arriveDate` across
+// currently visible itineraries. Returns null when no stops exist or the
+// earliest date has passed — the masthead hides the number in both cases.
+function computeCountdown(rows: ListableRow[]): number | null {
+  let earliest: string | null = null;
+  for (const r of rows) {
+    const d = r.span?.earliest;
+    if (typeof d !== "string" || d.length === 0) continue;
+    if (earliest === null || d < earliest) earliest = d;
+  }
+  if (earliest === null) return null;
+  const [y, m, day] = earliest.split("-").map(Number);
+  const targetMs = Date.UTC(y, m - 1, day);
+  const diff = Math.ceil((targetMs - Date.now()) / 86_400_000);
+  return diff > 0 ? diff : null;
+}
+
+function EditorialItineraryItem({
   it,
+  index,
+  lead,
   vote,
   isEditor,
   style,
 }: {
   it: ListableRow;
+  index: number;
+  lead: boolean;
   vote: { count: number; userHasVoted: boolean };
   isEditor: boolean;
   style?: React.CSSProperties;
 }) {
+  const numeral = ROMAN[index] ?? `${index + 1}`;
   return (
-    <li className="animate-in rounded-lg border border-dust bg-white/85 p-4 sm:p-6 transition-colors hover:bg-white" style={style}>
-      <div className="flex items-start justify-between gap-4">
+    <li
+      className="animate-in border-b border-ink/12 first:border-t first:border-ink/12"
+      style={style}
+    >
+      <div
+        className={[
+          "grid grid-cols-[2rem_1fr_auto] items-start gap-x-4 md:grid-cols-[3rem_1fr_auto] md:gap-x-6",
+          lead ? "py-7 md:py-10" : "py-5 md:py-7",
+        ].join(" ")}
+      >
+        <div
+          className={[
+            "pt-1 font-serif italic text-ink/40 tabular-nums",
+            lead ? "text-xl md:text-2xl" : "text-base md:text-lg",
+          ].join(" ")}
+          aria-hidden="true"
+        >
+          {numeral}.
+        </div>
         <div className="min-w-0">
-          <Link
-            href={`/itineraries/${it.slug}`}
-            className="font-serif text-2xl font-semibold hover:text-terracotta"
-          >
-            {it.title}
+          <Link href={`/itineraries/${it.slug}`} className="group block">
+            <h3
+              className={[
+                "font-serif font-semibold leading-[1.1] tracking-tight transition-colors group-hover:text-terracotta",
+                lead ? "text-3xl md:text-4xl" : "text-xl md:text-2xl",
+              ].join(" ")}
+            >
+              {it.title}
+            </h3>
           </Link>
-          <p className="mt-1 text-sm text-ink/60">
+          <p className="mt-2 text-sm text-ink/60">
             {it.span?.earliest && it.span?.latest ? (
               <>
-                {formatRange(it.span.earliest, it.span.latest)} ·{" "}
-                {it.span.stopCount} stops
+                <span>{formatRange(it.span.earliest, it.span.latest)}</span>
+                <span className="mx-2 text-ink/25" aria-hidden="true">·</span>
+                <span>{it.span.stopCount} stops</span>
+                {it.status !== "active" && (
+                  <>
+                    <span className="mx-2 text-ink/25" aria-hidden="true">·</span>
+                    <span className="italic">{it.status}</span>
+                  </>
+                )}
               </>
             ) : (
-              <>No stops yet.</>
+              <span className="italic">No stops yet.</span>
             )}
           </p>
         </div>
-        <StatusBadge status={it.status} />
-      </div>
-      <div className="mt-3 flex items-center justify-between">
-        <VoteButton
-          targetType="itinerary"
-          targetId={it.id}
-          count={vote.count}
-          userHasVoted={vote.userHasVoted}
-          label={it.title}
-        />
-        {isEditor && (
-          <ItineraryStatusControl
-            itineraryId={it.id}
-            status={it.status as "draft" | "active" | "archived"}
+        <div className="flex flex-col items-end gap-2">
+          <VoteButton
+            targetType="itinerary"
+            targetId={it.id}
+            count={vote.count}
+            userHasVoted={vote.userHasVoted}
+            label={it.title}
           />
-        )}
+          {isEditor && (
+            <ItineraryStatusControl
+              itineraryId={it.id}
+              status={it.status as "draft" | "active" | "archived"}
+            />
+          )}
+        </div>
       </div>
     </li>
   );
@@ -190,103 +239,149 @@ export default async function Home() {
       : Promise.resolve(new Map()),
   ]);
 
+  const countdown = computeCountdown(visible);
+
   return (
-    <main className="min-h-screen text-ink px-6 py-12">
-      <div className="mx-auto max-w-3xl">
-        <div className="animate-in flex items-center justify-end gap-4">
-          <Link
-            href="/crew"
-            className="text-sm text-ink/60 hover:text-terracotta"
-          >
-            Crew →
-          </Link>
-          {isEditor && (
-            <>
-              <Link
-                href="/admin/broadcast"
-                className="text-sm text-ink/60 hover:text-terracotta"
-              >
-                Broadcast →
-              </Link>
+    <main className="min-h-screen text-ink px-6 py-10 md:py-14">
+      {/* Masthead */}
+      <div className="mx-auto max-w-5xl">
+        <div className="animate-in flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.22em] text-ink/55">
+            <span>Italia &middot; MMXXVII</span>
+            {countdown !== null && (
+              <>
+                <span className="text-ink/25" aria-hidden="true">·</span>
+                <span title={`${countdown} days until departure`}>
+                  No. {countdown}
+                </span>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-4">
+            {isEditor && (
               <Link
                 href="/admin/import"
                 className="text-sm text-ink/60 hover:text-terracotta"
               >
                 Import →
               </Link>
-            </>
-          )}
-          <form action={handleSignOut}>
-            <Button
-              type="submit"
-              variant="ghost"
-              className="text-sm text-ink/70 hover:text-ink"
-            >
-              Sign out
-            </Button>
-          </form>
+            )}
+            <form action={handleSignOut}>
+              <Button
+                type="submit"
+                variant="ghost"
+                className="text-sm text-ink/70 hover:text-ink"
+              >
+                Sign out
+              </Button>
+            </form>
+          </div>
         </div>
+        <div className="mt-3 border-t border-ink/12" />
+      </div>
 
-        <header className="animate-in mt-8 mb-12" style={{ animationDelay: "80ms" }}>
-          <h1 className="font-serif text-4xl font-semibold">Ciao, {name}.</h1>
-          <p className="mt-2 text-base text-ink/60">
-            Le opzioni <span className="text-ink/50">/ what we&apos;re thinking</span>
-          </p>
-          <ActiveUsers presences={presences} currentUserId={userId} />
+      {/* Greeting + frase aside */}
+      <div className="mx-auto max-w-5xl">
+        <header className="mt-10 grid items-end gap-8 md:mt-16 md:grid-cols-[1fr_minmax(0,22rem)] md:gap-14">
+          <div className="animate-in" style={{ animationDelay: "80ms" }}>
+            <h1
+              className="font-serif font-semibold leading-[1.02] tracking-tight"
+              style={{ fontSize: "clamp(2.75rem, 7vw, 5rem)" }}
+            >
+              Ciao,{" "}
+              <span className="italic font-normal text-ink/85">{name}</span>.
+            </h1>
+            <p className="mt-5 font-serif italic text-lg text-ink/70">
+              Le opzioni &mdash; what we&apos;re thinking.
+            </p>
+            <ActiveUsers presences={presences} currentUserId={userId} />
+          </div>
+          <aside
+            className="animate-in md:max-w-[22rem] md:self-end md:justify-self-end"
+            style={{ animationDelay: "160ms" }}
+          >
+            <PhraseOfTheDay />
+          </aside>
         </header>
+      </div>
 
-        <PhraseOfTheDay />
-
-        {overview.length > 0 && (
-          <section className="animate-in mb-12" style={{ animationDelay: "160ms" }}>
-            <h2 className="font-serif text-2xl font-semibold">
-              Le possibilità{" "}
-              <span className="text-ink/50 text-xl font-normal">
-                / at a glance
-              </span>
+      {/* Overview map — breaks out to wider container */}
+      {overview.length > 0 && (
+        <section
+          className="animate-in mx-auto mt-14 max-w-5xl md:mt-20"
+          style={{ animationDelay: "240ms" }}
+        >
+          <div className="mb-5">
+            <p className="text-[10px] uppercase tracking-[0.22em] text-ink/45">
+              La mappa
+            </p>
+            <h2 className="mt-1 font-serif text-2xl font-semibold leading-tight md:text-3xl">
+              At a glance
             </h2>
-            <div className="mt-4">
-              <OverviewMapLoader itineraries={overview} />
-            </div>
-            <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
-              {overview.map((it) => (
-                <li key={it.id}>
-                  <Link
-                    href={`/itineraries/${it.slug}`}
-                    className="inline-flex items-center gap-2 text-sm text-ink/70 hover:text-ink"
+          </div>
+          <OverviewMapLoader itineraries={overview} />
+          <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2 border-t border-ink/12 pt-3 text-sm">
+            {overview.map((it) => (
+              <li key={it.id}>
+                <Link
+                  href={`/itineraries/${it.slug}`}
+                  className="inline-flex items-baseline gap-2 text-ink/70 hover:text-ink"
+                >
+                  <span
+                    className="font-serif text-base font-semibold italic"
+                    style={{ color: it.colour }}
                   >
-                    <span
-                      className="inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold text-cream"
-                      style={{ backgroundColor: it.colour }}
-                    >
-                      {it.label}
-                    </span>
-                    {it.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+                    {it.label}.
+                  </span>
+                  <span>{it.title}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
+      {/* Il piano — itinerary list */}
+      <section
+        className="animate-in mx-auto mt-14 max-w-3xl md:mt-20"
+        style={{ animationDelay: "320ms" }}
+      >
         {visible.length === 0 && archived.length === 0 ? (
           <p className="text-base text-ink/70">
             Ozzie hasn&apos;t cooked anything up yet. Sit tight.
           </p>
-        ) : (
-          <ul className="space-y-4">
-            {visible.map((it, i) => (
-              <ItineraryCard
-                key={it.id}
-                it={it}
-                vote={visibleVotes.get(it.id) ?? { count: 0, userHasVoted: false }}
-                isEditor={isEditor}
-                style={{ animationDelay: `${240 + i * 80}ms` }}
-              />
-            ))}
-          </ul>
-        )}
+        ) : visible.length > 0 ? (
+          <>
+            <div className="flex items-baseline gap-3">
+              <p className="text-[10px] uppercase tracking-[0.22em] text-ink/45">
+                Il piano
+              </p>
+              <span className="text-ink/25" aria-hidden="true">·</span>
+              <p className="font-serif text-base italic text-ink/60">
+                plans on the table
+              </p>
+            </div>
+            <ul className="mt-5">
+              {visible.map((it, i) => (
+                <EditorialItineraryItem
+                  key={it.id}
+                  it={it}
+                  index={i}
+                  lead={i === 0}
+                  vote={
+                    visibleVotes.get(it.id) ?? { count: 0, userHasVoted: false }
+                  }
+                  isEditor={isEditor}
+                  style={{ animationDelay: `${400 + i * 80}ms` }}
+                />
+              ))}
+            </ul>
+          </>
+        ) : null}
+      </section>
 
+      {/* Wishlist */}
+      <div className="mx-auto mt-14 max-w-3xl md:mt-20">
         <WishlistSection
           rows={wishlist}
           comments={wishlistComments}
@@ -294,14 +389,19 @@ export default async function Home() {
           isEditor={isEditor}
           promotionTargets={promotionTargets}
         />
+      </div>
 
-        {isEditor && (
+      {/* Archived (editors) */}
+      {isEditor && archived.length > 0 && (
+        <div className="mx-auto max-w-3xl">
           <ArchivedToggle count={archived.length}>
-            <ul className="space-y-4">
-              {archived.map((it) => (
-                <ItineraryCard
+            <ul>
+              {archived.map((it, i) => (
+                <EditorialItineraryItem
                   key={it.id}
                   it={it}
+                  index={i}
+                  lead={false}
                   vote={
                     archivedVotes.get(it.id) ?? { count: 0, userHasVoted: false }
                   }
@@ -310,8 +410,8 @@ export default async function Home() {
               ))}
             </ul>
           </ArchivedToggle>
-        )}
-      </div>
+        </div>
+      )}
     </main>
   );
 }
