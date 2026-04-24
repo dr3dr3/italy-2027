@@ -36,8 +36,13 @@ export function Suggestion({
               {s.kind}
             </span>
             {s.isConfirmed && (
-              <span className="inline-flex items-center gap-1 rounded bg-olive/15 px-1.5 py-0.5 text-xs font-medium text-olive">
-                ✓ Confirmed
+              <span
+                className="stamp stamp-olive"
+                style={{
+                  transform: `rotate(${(((s.id * 17) % 4) + 1) * 0.9 * (s.id % 2 === 0 ? 1 : -1)}deg)`,
+                }}
+              >
+                Confirmed
               </span>
             )}
             <h5 className="text-base font-medium text-ink">{s.title}</h5>

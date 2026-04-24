@@ -12,16 +12,16 @@ export function ArchivedToggle({
   const [open, setOpen] = useState(false);
   if (count === 0) return null;
   return (
-    <div className="mt-8">
+    <div className="mt-12">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="py-1 text-sm text-ink/60 hover:text-ink"
+        className="font-serif italic text-base text-ink/55 hover:text-ink"
         aria-expanded={open}
       >
-        {open ? "Hide" : "Show"} archived ({count})
+        {open ? "hide archived" : `view ${count} archived`} &rarr;
       </button>
-      {open && <div className="mt-4 opacity-60">{children}</div>}
+      {open && <div className="mt-6 opacity-70">{children}</div>}
     </div>
   );
 }
