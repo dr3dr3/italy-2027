@@ -54,7 +54,7 @@ function CrewCard({
               {member.name ?? "Someone"}
             </span>
             {isMe && (
-              <span className="text-xs text-ink/40">— that's you</span>
+              <span className="text-xs text-ink/40">— that&apos;s you</span>
             )}
           </div>
           <p
@@ -97,7 +97,7 @@ export default async function CrewPage() {
         <header className="animate-in mt-8 mb-8" style={{ animationDelay: "80ms" }}>
           <h1 className="font-serif text-4xl font-semibold">La combriccola</h1>
           <p className="mt-2 text-base text-ink/60">
-            The crew <span className="text-ink/40">/ chi c'è</span>
+            The crew <span className="text-ink/40">/ chi c&apos;è</span>
           </p>
         </header>
 
@@ -109,7 +109,7 @@ export default async function CrewPage() {
 
         <p className="mt-8 text-xs text-ink/40">
           Every comment, vote, suggestion, and video counts. No leaderboard,
-          just who's chipping in.
+          just who&apos;s chipping in.
         </p>
       </div>
     </main>
