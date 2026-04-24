@@ -5,6 +5,7 @@ import { CommentThread } from "@/components/comments/comment-thread";
 import type { SuggestionRow } from "@/lib/queries/suggestions";
 import type { CommentRow } from "@/lib/queries/comments";
 import { ConfirmToggleButton } from "./confirm-toggle-button";
+import { ConvertToVisitControl } from "./convert-to-visit-control";
 import { DeleteSuggestionButton } from "./delete-suggestion-button";
 import { SuggestionCommentsToggle } from "./suggestion-comments-toggle";
 
@@ -84,6 +85,15 @@ export function Suggestion({
         )}
         {canDelete && <DeleteSuggestionButton suggestionId={s.id} />}
       </div>
+      {isEditor && (
+        <ConvertToVisitControl
+          suggestionId={s.id}
+          defaultName={s.title}
+          defaultDescription={[s.notes ?? "", s.url ?? ""]
+            .filter((v) => v.length > 0)
+            .join("\n\n")}
+        />
+      )}
     </div>
   );
 }
