@@ -201,12 +201,20 @@ export default async function Home() {
             Crew →
           </Link>
           {isEditor && (
-            <Link
-              href="/admin/import"
-              className="text-sm text-ink/60 hover:text-terracotta"
-            >
-              Import →
-            </Link>
+            <>
+              <Link
+                href="/admin/broadcast"
+                className="text-sm text-ink/60 hover:text-terracotta"
+              >
+                Broadcast →
+              </Link>
+              <Link
+                href="/admin/import"
+                className="text-sm text-ink/60 hover:text-terracotta"
+              >
+                Import →
+              </Link>
+            </>
           )}
           <form action={handleSignOut}>
             <Button
