@@ -3,7 +3,7 @@ import { desc, inArray, min, max, count } from "drizzle-orm";
 import { auth, signOut } from "@/auth";
 import { db, itineraries, stops } from "@/db";
 import { Button } from "@/components/ui/button";
-import { formatRange } from "@/lib/dates";
+import { daysUntil, formatRange } from "@/lib/dates";
 import { VoteButton } from "@/components/votes/vote-button";
 import { getItineraryVoteSummariesForUser } from "@/lib/queries/votes";
 import { getStopsForActiveItineraries } from "@/lib/queries/stops";
@@ -104,21 +104,16 @@ async function loadItinerariesByStatus(statuses: Array<"draft" | "active" | "arc
   return rows.map((r) => ({ ...r, span: byId.get(r.id) }));
 }
 
-// Days-until-departure for the masthead. Uses the earliest `arriveDate` across
-// currently visible itineraries. Returns null when no stops exist or the
-// earliest date has passed — the masthead hides the number in both cases.
-function computeCountdown(rows: ListableRow[]): number | null {
+// Earliest arriveDate across visible itineraries — drives the masthead
+// countdown. Returns null when no stops exist yet.
+function earliestArrive(rows: ListableRow[]): string | null {
   let earliest: string | null = null;
   for (const r of rows) {
     const d = r.span?.earliest;
     if (typeof d !== "string" || d.length === 0) continue;
     if (earliest === null || d < earliest) earliest = d;
   }
-  if (earliest === null) return null;
-  const [y, m, day] = earliest.split("-").map(Number);
-  const targetMs = Date.UTC(y, m - 1, day);
-  const diff = Math.ceil((targetMs - Date.now()) / 86_400_000);
-  return diff > 0 ? diff : null;
+  return earliest;
 }
 
 function EditorialItineraryItem({
@@ -239,7 +234,8 @@ export default async function Home() {
       : Promise.resolve(new Map()),
   ]);
 
-  const countdown = computeCountdown(visible);
+  const earliest = earliestArrive(visible);
+  const countdown = earliest ? daysUntil(earliest) : null;
 
   return (
     <main className="min-h-screen text-ink px-6 py-10 md:py-14">

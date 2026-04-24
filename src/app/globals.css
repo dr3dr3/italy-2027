@@ -73,6 +73,40 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Editorial drop cap — first letter of a paragraph set in the display serif,
+   book-opener style. Applied with `className="drop-cap"`. */
+.drop-cap::first-letter {
+  float: left;
+  font-family: var(--font-bitter), serif;
+  font-weight: 600;
+  font-size: 3.4em;
+  line-height: 0.82;
+  margin: 0.08em 0.1em 0 -0.04em;
+  color: var(--terracotta);
+}
+
+/* Rubber-stamp label — small-caps, letterspaced, slight rotation. Ships in two
+   tones via the modifier classes below; the rotation is inline so one-off
+   placements can override it. */
+.stamp {
+  display: inline-block;
+  padding: 0.28rem 0.65rem 0.22rem;
+  font-family: var(--font-bitter), serif;
+  font-weight: 600;
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  transform: rotate(-1.8deg);
+  transform-origin: center;
+  white-space: nowrap;
+}
+.stamp-olive  { color: color-mix(in oklab, var(--olive) 78%, transparent); }
+.stamp-ink    { color: color-mix(in oklab, var(--ink) 55%, transparent); }
+.stamp-wine   { color: color-mix(in oklab, var(--wine) 72%, transparent); }
+.stamp-terra  { color: color-mix(in oklab, var(--terracotta) 78%, transparent); }
+
 @media (prefers-reduced-motion: reduce) {
   .animate-in {
     animation: none;

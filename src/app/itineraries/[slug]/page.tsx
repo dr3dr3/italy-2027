@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import { asc, eq } from "drizzle-orm";
 import { MessageCircle } from "lucide-react";
 import { db, itineraries, stops } from "@/db";
-import { StatusBadge } from "@/components/status-badge";
-import { formatDay, formatRange } from "@/lib/dates";
+import { daysUntil, formatDay, formatRange } from "@/lib/dates";
 import { auth } from "@/auth";
 import { CommentThread } from "@/components/comments/comment-thread";
 import { StopCommentsToggle } from "@/components/comments/stop-comments";
@@ -42,6 +41,27 @@ import {
 } from "@/lib/participations";
 
 type Stop = typeof stops.$inferSelect;
+
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+
+function statusTone(status: string): "olive" | "ink" | "wine" | "terra" {
+  switch (status) {
+    case "active": return "olive";
+    case "draft": return "ink";
+    case "archived": return "ink";
+    default: return "ink";
+  }
+}
+
+// Deterministic rotation so each stamp sits at its own slight angle (real
+// stamps are never perfectly aligned). Seeded by id so it's stable across
+// renders but varies between items on the page. Skips 0° — a non-rotated
+// stamp just reads as a pill.
+function stampRotation(seed: number): number {
+  const magnitude = ((seed * 17) % 4) + 1; // 1..4
+  const sign = seed % 2 === 0 ? 1 : -1;
+  return magnitude * 0.9 * sign; // ±0.9, ±1.8, ±2.7, ±3.6
+}
 
 function groupByDay(rows: Stop[]): Map<number, Stop[]> {
   const byDay = new Map<number, Stop[]>();
@@ -171,25 +191,79 @@ export default async function ItineraryPage({
     }
   }
 
-  return (
-    <main className="min-h-screen text-ink px-6 py-12">
-      <div className="mx-auto max-w-3xl">
-        <Link
-          href="/"
-          className="animate-in text-sm text-ink/60 hover:text-ink"
-        >
-          ← Le opzioni <span className="text-ink/50">/ back</span>
-        </Link>
+  const countdown = tripStart ? daysUntil(tripStart) : null;
 
+  // Editorial subtitle — "First → Last · N days". Collapses to a single name
+  // when the trip starts and ends at the same place (or has only one stop).
+  const firstName = stopRows[0]?.name;
+  const lastName = stopRows[stopRows.length - 1]?.name;
+  const dayCount = dayNumbers.length;
+  const dayLabel = dayCount === 1 ? "day" : "days";
+  const subtitle =
+    firstName && lastName && dayCount > 0
+      ? firstName === lastName || stopRows.length === 1
+        ? `${firstName} · ${dayCount} ${dayLabel}`
+        : `${firstName} → ${lastName} · ${dayCount} ${dayLabel}`
+      : null;
+
+  const tone = statusTone(itinerary.status);
+  const statusRotation = stampRotation(itinerary.id);
+
+  return (
+    <main className="min-h-screen text-ink">
+      {/* Masthead — shared visual language with the home */}
+      <div className="mx-auto max-w-5xl px-6 pt-10 md:pt-14">
+        <div className="animate-in flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.22em] text-ink/55">
+            <span>Italia &middot; MMXXVII</span>
+            {countdown !== null && (
+              <>
+                <span className="text-ink/25" aria-hidden="true">·</span>
+                <span title={`${countdown} days until departure`}>
+                  No. {countdown}
+                </span>
+              </>
+            )}
+          </div>
+          <Link
+            href="/"
+            className="text-sm text-ink/60 hover:text-ink"
+          >
+            ← Le opzioni
+          </Link>
+        </div>
+        <div className="mt-3 border-t border-ink/12" />
+      </div>
+
+      {/* Title block */}
+      <div className="mx-auto max-w-5xl px-6">
         <header
-          className="animate-in mt-6 mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
+          className="animate-in mt-10 grid items-end gap-6 md:mt-16 md:grid-cols-[1fr_auto] md:gap-12"
           style={{ animationDelay: "80ms" }}
         >
-          <h1 className="font-serif text-4xl font-semibold">
-            {itinerary.title}
-          </h1>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <StatusBadge status={itinerary.status} />
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.22em] text-ink/45">
+              Itinerario
+            </p>
+            <h1
+              className="mt-2 font-serif font-semibold leading-[1.02] tracking-tight"
+              style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)" }}
+            >
+              {itinerary.title}
+            </h1>
+            {subtitle && (
+              <p className="mt-4 font-serif italic text-lg text-ink/70">
+                {subtitle}
+              </p>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-3 md:justify-end md:self-end md:pb-3">
+            <span
+              className={`stamp stamp-${tone}`}
+              style={{ transform: `rotate(${statusRotation}deg)` }}
+            >
+              {itinerary.status}
+            </span>
             {isEditor && (
               <ItineraryStatusControl
                 itineraryId={itinerary.id}
@@ -213,23 +287,32 @@ export default async function ItineraryPage({
             />
           </div>
         </header>
+      </div>
 
-        <section className="animate-in mb-10" style={{ animationDelay: "160ms" }}>
-          <h2 className="font-serif text-2xl font-semibold">
-            La mappa{" "}
-            <span className="text-ink/50 text-xl font-normal">/ the map</span>
+      {/* Map */}
+      <section
+        className="animate-in mx-auto mt-12 max-w-5xl px-6 md:mt-16"
+        style={{ animationDelay: "160ms" }}
+      >
+        <div className="mb-5">
+          <p className="text-[10px] uppercase tracking-[0.22em] text-ink/45">
+            La mappa
+          </p>
+          <h2 className="mt-1 font-serif text-2xl font-semibold leading-tight md:text-3xl">
+            The map
           </h2>
-          <div className="mt-4">
-            {mapStops.length > 0 ? (
-              <ItineraryMapLoader stops={mapStops} visits={mapVisits} />
-            ) : (
-              <p className="text-sm text-ink/50">
-                Somewhere in Italy, probably.
-              </p>
-            )}
-          </div>
-        </section>
+        </div>
+        {mapStops.length > 0 ? (
+          <ItineraryMapLoader stops={mapStops} visits={mapVisits} />
+        ) : (
+          <p className="font-serif italic text-base text-ink/55">
+            Somewhere in Italy, probably.
+          </p>
+        )}
+      </section>
 
+      {/* Participations */}
+      <div className="mx-auto mt-12 max-w-3xl px-6 md:mt-16">
         <ParticipationsSection
           itineraryId={itinerary.id}
           people={people}
@@ -238,67 +321,93 @@ export default async function ItineraryPage({
           tripStart={tripStart}
           tripEnd={tripEnd}
         />
+      </div>
 
-        <h2 className="animate-in font-serif text-2xl font-semibold" style={{ animationDelay: "240ms" }}>
-          Il piano{" "}
-          <span className="text-ink/50 text-xl font-normal">/ the plan</span>
-        </h2>
+      {/* Ornamental break */}
+      <div
+        className="mx-auto mt-16 max-w-3xl select-none px-6 text-center font-serif text-2xl text-ink/25"
+        aria-hidden="true"
+      >
+        ❦
+      </div>
+
+      {/* Il piano — plan */}
+      <section className="mx-auto mt-8 max-w-3xl px-6">
+        <div
+          className="animate-in flex items-baseline gap-3"
+          style={{ animationDelay: "240ms" }}
+        >
+          <p className="text-[10px] uppercase tracking-[0.22em] text-ink/45">
+            Il piano
+          </p>
+          <span className="text-ink/25" aria-hidden="true">·</span>
+          <p className="font-serif text-base italic text-ink/60">the plan</p>
+        </div>
 
         {dayNumbers.length > 1 && (
-          <nav className="animate-in mt-3 flex flex-wrap gap-x-3 gap-y-1 text-sm text-ink/60" style={{ animationDelay: "300ms" }}>
+          <nav
+            className="animate-in mt-4 flex flex-wrap gap-x-4 gap-y-1"
+            style={{ animationDelay: "300ms" }}
+          >
             {dayNumbers.map((day) => (
               <a
                 key={day}
                 href={`#day-${day}`}
-                className="hover:text-ink"
+                className="font-serif text-sm italic text-ink/55 tabular-nums hover:text-ink"
               >
-                Day {day}
+                {day}
               </a>
             ))}
           </nav>
         )}
 
-        <ol className="mt-6 space-y-8">
-          {dayNumbers.map((day, i) => {
+        <ol className="mt-8">
+          {dayNumbers.map((day, dayIdx) => {
             const dayStops = days.get(day)!;
             const firstArrive = dayStops[0].arriveDate;
             return (
               <li
                 key={day}
                 id={`day-${day}`}
-                className="animate-in scroll-mt-16 sm:scroll-mt-6"
-                style={{ animationDelay: `${360 + i * 80}ms` }}
+                className="animate-in mt-14 scroll-mt-16 first:mt-0 sm:scroll-mt-6"
+                style={{ animationDelay: `${360 + dayIdx * 80}ms` }}
               >
-                <h3 className="font-serif text-2xl font-semibold">
-                  Day {day}
-                  {firstArrive && (
-                    <span className="text-ink/50">
-                      {" "}
-                      · {formatDay(firstArrive)}
-                    </span>
-                  )}
-                </h3>
-                <div className="mt-3 space-y-4">
-                  {dayStops.map((s) => {
+                <header>
+                  <p className="text-[10px] uppercase tracking-[0.22em] text-ink/45">
+                    Giorno {day}
+                  </p>
+                  <h3 className="mt-1 font-serif text-3xl font-semibold leading-tight tracking-tight md:text-4xl">
+                    {firstArrive ? formatDay(firstArrive) : `Day ${day}`}
+                  </h3>
+                  <div className="mt-3 border-t border-ink/15" />
+                </header>
+                <div className="mt-6">
+                  {dayStops.map((s, stopIdx) => {
                     const v = stopVotes.get(s.id) ?? {
                       count: 0,
                       userHasVoted: false,
                     };
+                    const numeral = ROMAN[stopIdx] ?? `${stopIdx + 1}`;
+                    const isFirstStop = dayIdx === 0 && stopIdx === 0;
                     return (
-                      <div
+                      <article
                         key={s.id}
                         id={`stop-${s.id}`}
-                        className="rounded-lg border border-dust bg-white/85 p-4 sm:p-5 scroll-mt-16 sm:scroll-mt-6"
+                        className="scroll-mt-16 border-b border-ink/10 py-7 last:border-b-0 md:py-9 sm:scroll-mt-6"
                       >
                         <div className="flex items-start justify-between gap-4">
-                          <div>
-                            <h4 className="font-serif text-lg font-semibold">
+                          <div className="min-w-0">
+                            <p className="text-[10px] uppercase tracking-[0.22em] text-ink/45">
+                              Tappa{" "}
+                              <span className="not-italic">{numeral}</span>
+                            </p>
+                            <h4 className="mt-1 font-serif text-2xl font-semibold leading-tight tracking-tight md:text-3xl">
                               {s.name}
                             </h4>
                             {s.arriveDate && s.departDate && (
-                              <div className="mt-1 text-sm text-ink/60">
+                              <p className="mt-2 font-serif text-sm italic text-ink/55">
                                 {formatRange(s.arriveDate, s.departDate)}
-                              </div>
+                              </p>
                             )}
                           </div>
                           <VoteButton
@@ -310,45 +419,53 @@ export default async function ItineraryPage({
                           />
                         </div>
                         {s.description && (
-                          <p className="mt-2 text-base text-ink/80">
+                          <p
+                            className={`mt-4 text-base leading-relaxed text-ink/85 ${
+                              isFirstStop ? "drop-cap" : ""
+                            }`}
+                          >
                             {s.description}
                           </p>
                         )}
-                        <AbsenteePill absentees={absenteesByStop.get(s.id) ?? []} />
-                        <VideosSection
-                          stopId={s.id}
-                          videos={allVideos.get(s.id) ?? []}
-                          currentUserId={userId}
-                          isEditor={isEditor}
+                        <AbsenteePill
+                          absentees={absenteesByStop.get(s.id) ?? []}
                         />
-                        <SuggestionsSection
-                          stopId={s.id}
-                          suggestions={allSuggestions.get(s.id) ?? []}
-                          suggestionComments={suggestionComments}
-                          currentUserId={userId}
-                          isEditor={isEditor}
-                        />
-                        <VisitsSection
-                          visits={
-                            allVisits.get(s.id) ?? {
-                              daytrips: [],
-                              enroute: [],
-                            }
-                          }
-                          nextStopName={nextStopName.get(s.id) ?? null}
-                          isEditor={isEditor}
-                        />
-                        <StopCommentsToggle
-                          count={stopCommentCounts.get(s.id) ?? 0}
-                        >
-                          <CommentThread
-                            targetType="stop"
-                            targetId={s.id}
-                            initialRows={stopComments.get(s.id) ?? []}
+                        <div className="mt-6 space-y-6">
+                          <VideosSection
+                            stopId={s.id}
+                            videos={allVideos.get(s.id) ?? []}
                             currentUserId={userId}
+                            isEditor={isEditor}
                           />
-                        </StopCommentsToggle>
-                      </div>
+                          <SuggestionsSection
+                            stopId={s.id}
+                            suggestions={allSuggestions.get(s.id) ?? []}
+                            suggestionComments={suggestionComments}
+                            currentUserId={userId}
+                            isEditor={isEditor}
+                          />
+                          <VisitsSection
+                            visits={
+                              allVisits.get(s.id) ?? {
+                                daytrips: [],
+                                enroute: [],
+                              }
+                            }
+                            nextStopName={nextStopName.get(s.id) ?? null}
+                            isEditor={isEditor}
+                          />
+                          <StopCommentsToggle
+                            count={stopCommentCounts.get(s.id) ?? 0}
+                          >
+                            <CommentThread
+                              targetType="stop"
+                              targetId={s.id}
+                              initialRows={stopComments.get(s.id) ?? []}
+                              currentUserId={userId}
+                            />
+                          </StopCommentsToggle>
+                        </div>
+                      </article>
                     );
                   })}
                 </div>
@@ -356,33 +473,50 @@ export default async function ItineraryPage({
             );
           })}
         </ol>
+      </section>
 
-        <section id="discussion" className="mt-16 scroll-mt-6">
-          <h2 className="font-serif text-2xl font-semibold">
-            La discussione{" "}
-            <span className="text-ink/50 text-xl font-normal">
-              / talking points
-            </span>
-          </h2>
-          <div className="mt-6">
-            <CommentThread
-              targetType="itinerary"
-              targetId={itinerary.id}
-              initialRows={itineraryComments}
-              currentUserId={userId}
-            />
-          </div>
-        </section>
-
-        {stopRows.length > 0 && (
-          <footer className="mt-12 pb-4 text-center text-sm text-ink/60 font-serif italic">
-            {stopRows.length} {stopRows.length === 1 ? "stop" : "stops"} · {dayNumbers.length} {dayNumbers.length === 1 ? "day" : "days"}
-            {stopRows[0].arriveDate && (
-              <> · leaving {formatDay(stopRows[0].arriveDate)}</>
-            )}
-          </footer>
-        )}
+      {/* Ornamental break */}
+      <div
+        className="mx-auto mt-16 max-w-3xl select-none px-6 text-center font-serif text-2xl text-ink/25"
+        aria-hidden="true"
+      >
+        ❦
       </div>
+
+      {/* Discussion */}
+      <section
+        id="discussion"
+        className="mx-auto mt-8 max-w-3xl scroll-mt-6 px-6"
+      >
+        <div className="flex items-baseline gap-3">
+          <p className="text-[10px] uppercase tracking-[0.22em] text-ink/45">
+            La discussione
+          </p>
+          <span className="text-ink/25" aria-hidden="true">·</span>
+          <p className="font-serif text-base italic text-ink/60">
+            talking points
+          </p>
+        </div>
+        <div className="mt-6">
+          <CommentThread
+            targetType="itinerary"
+            targetId={itinerary.id}
+            initialRows={itineraryComments}
+            currentUserId={userId}
+          />
+        </div>
+      </section>
+
+      {stopRows.length > 0 && (
+        <footer className="mx-auto mt-16 max-w-3xl px-6 pb-10 text-center font-serif text-sm italic text-ink/55">
+          {stopRows.length} {stopRows.length === 1 ? "stop" : "stops"} ·{" "}
+          {dayNumbers.length}{" "}
+          {dayNumbers.length === 1 ? "day" : "days"}
+          {stopRows[0].arriveDate && (
+            <> · leaving {formatDay(stopRows[0].arriveDate)}</>
+          )}
+        </footer>
+      )}
     </main>
   );
 }

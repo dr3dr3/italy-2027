@@ -65,6 +65,17 @@ export function formatDay(d: string): string {
 }
 
 /**
+ * Days between now and a YYYY-MM-DD date, rounded up. Returns null when the
+ * date has already passed — callers use this to hide countdown chrome.
+ */
+export function daysUntil(dateStr: string): number | null {
+  const { day, month, year } = parse(dateStr);
+  const targetMs = Date.UTC(year, month, day);
+  const diff = Math.ceil((targetMs - Date.now()) / 86_400_000);
+  return diff > 0 ? diff : null;
+}
+
+/**
  * Format a stay range, omitting the year.
  * Same day: "14 May"
  * Same month: "14–18 May"
