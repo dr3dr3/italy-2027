@@ -109,7 +109,7 @@ export function PromptGenerator({ initialSignal, initialPrompt, version }: Props
             <div>
               <p className="font-medium text-ink/80">Loved stops</p>
               {signal.lovedStops.length === 0 ? (
-                <p className="mt-1 italic text-ink/50">No hearts on stops yet.</p>
+                <p className="mt-1 italic text-ink/50">No votes on stops yet.</p>
               ) : (
                 <ul className="mt-1 space-y-0.5">
                   {signal.lovedStops.map((s) => (

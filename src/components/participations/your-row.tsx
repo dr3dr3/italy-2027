@@ -159,7 +159,7 @@ function EditForm({
         setError(result.error);
         return;
       }
-      toast.success(Math.random() < 0.33 ? "Noted." : "Saved.");
+      toast.success("Saved.");
       onClose();
     });
   }

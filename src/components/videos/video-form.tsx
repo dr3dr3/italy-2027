@@ -73,7 +73,7 @@ export function VideoForm({
     >
       {isEmpty && (
         <p className="text-sm text-ink/50">
-          No one&apos;s shared a video yet. Be the hero.
+          No one&apos;s shared a video yet. Could be first.
         </p>
       )}
       <div className="space-y-1">
