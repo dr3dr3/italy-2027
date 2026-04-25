@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { desc, inArray, min, max, count } from "drizzle-orm";
 import { auth, signOut } from "@/auth";
 import { db, itineraries, stops } from "@/db";
@@ -15,6 +16,9 @@ import { ActiveUsers } from "@/components/presence/active-users";
 import { getActivePresence } from "@/lib/queries/users";
 import { WishlistSection } from "@/components/wishlist/wishlist-section";
 import { PhraseOfTheDay } from "@/components/phrase-of-the-day";
+import { MarkHomeSeen, WhatsNewChip } from "@/components/whats-new-chip";
+import { getActivitySince } from "@/lib/queries/activity";
+import { HOME_SEEN_COOKIE } from "@/lib/actions/home-seen";
 import {
   getPendingWishlist,
   getPromotionTargets,
@@ -250,8 +254,20 @@ export default async function Home() {
   const earliest = earliestArrive(visible);
   const countdown = earliest ? daysUntil(earliest) : null;
 
+  // What's new since the user's previous home visit. The cookie isn't set
+  // on first visit, so the chip stays hidden then; the client-side
+  // markHomeSeen() call after render bumps the cookie to "now" so the
+  // window for the next visit starts here.
+  const seenCookie = (await cookies()).get(HOME_SEEN_COOKIE);
+  const since = seenCookie?.value ? new Date(seenCookie.value) : null;
+  const activity =
+    since !== null && !Number.isNaN(since.getTime())
+      ? await getActivitySince(since, userId)
+      : null;
+
   return (
     <main className="min-h-screen text-ink px-6 py-10 md:py-14">
+      <MarkHomeSeen />
       {/* Masthead */}
       <div className="mx-auto max-w-5xl">
         <div className="animate-in flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
@@ -318,6 +334,9 @@ export default async function Home() {
               Le opzioni &mdash; what we&apos;re thinking.
             </p>
             <ActiveUsers presences={presences} currentUserId={userId} />
+            {activity && since && (
+              <WhatsNewChip counts={activity} since={since} />
+            )}
           </div>
           <aside
             className="animate-in md:max-w-[22rem] md:self-end md:justify-self-end"
