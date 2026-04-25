@@ -253,7 +253,21 @@ export default async function Home() {
               </>
             )}
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link
+              href="/crew"
+              className="text-sm text-ink/60 hover:text-terracotta"
+            >
+              Crew →
+            </Link>
+            {isEditor && (
+              <Link
+                href="/admin/broadcast"
+                className="text-sm text-ink/60 hover:text-terracotta"
+              >
+                Broadcast →
+              </Link>
+            )}
             {isEditor && (
               <Link
                 href="/admin/import"

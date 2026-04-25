@@ -18,7 +18,7 @@ export default async function AdminBroadcastPage() {
   ]);
 
   return (
-    <main className="min-h-screen bg-cream text-ink px-6 py-12">
+    <main className="min-h-screen text-ink px-6 py-12">
       <div className="mx-auto max-w-3xl">
         <Link href="/" className="text-sm text-ink/60 hover:text-ink">
           ← Le opzioni

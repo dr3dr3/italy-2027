@@ -98,7 +98,12 @@ export function GenerativeBackground() {
 
   // Initialize / re-initialize on route change (picks up URL param overrides).
   useEffect(() => {
-    if (pathname?.startsWith("/admin")) {
+    // Form-heavy admin tools stay plain — the busy canvas fights dense UI.
+    // Read-mostly admin pages (broadcast) get the background like everywhere else.
+    if (
+      pathname === "/admin/import" ||
+      pathname === "/admin/prompt-generator"
+    ) {
       setState(null);
       return;
     }
