@@ -52,6 +52,11 @@ body {
   animation: discussion-arrive 1400ms ease-out;
 }
 
+/* Same flash when a stop is deep-linked via hash (e.g. from the overview map). */
+article[id^="stop-"]:target {
+  animation: highlight-flash 1500ms ease-out;
+}
+
 /* Page-load entrance — staggered fade-up */
 @keyframes fade-up {
   from {

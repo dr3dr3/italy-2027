@@ -112,10 +112,10 @@ export default function OverviewMap({
                       {it.title}
                     </div>
                     <Link
-                      href={`/itineraries/${it.slug}`}
+                      href={`/itineraries/${it.slug}#stop-${s.id}`}
                       className="mt-2 inline-block text-sm text-terracotta hover:underline"
                     >
-                      View itinerary →
+                      Open stop →
                     </Link>
                   </Popup>
                 </Marker>
