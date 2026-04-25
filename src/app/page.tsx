@@ -18,7 +18,6 @@ import { WishlistSection } from "@/components/wishlist/wishlist-section";
 import { PhraseOfTheDay } from "@/components/phrase-of-the-day";
 import { MarkHomeSeen, WhatsNewChip } from "@/components/whats-new-chip";
 import { getActivitySince } from "@/lib/queries/activity";
-import { HOME_SEEN_COOKIE } from "@/lib/actions/home-seen";
 import {
   getPendingWishlist,
   getPromotionTargets,
@@ -258,7 +257,8 @@ export default async function Home() {
   // on first visit, so the chip stays hidden then; the client-side
   // markHomeSeen() call after render bumps the cookie to "now" so the
   // window for the next visit starts here.
-  const seenCookie = (await cookies()).get(HOME_SEEN_COOKIE);
+  // Cookie name duplicated in src/lib/actions/home-seen.ts — see note there.
+  const seenCookie = (await cookies()).get("homeSeenAt");
   const since = seenCookie?.value ? new Date(seenCookie.value) : null;
   const activity =
     since !== null && !Number.isNaN(since.getTime())
