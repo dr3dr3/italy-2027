@@ -234,6 +234,19 @@ export default async function Home() {
       : Promise.resolve(new Map()),
   ]);
 
+  // Display order: actives before drafts, then by vote count desc within
+  // each group. Sort is stable, so equal-vote items keep DB order
+  // (recent-updated first) as the natural tiebreaker.
+  visible.sort((a, b) => {
+    if (a.status !== b.status) {
+      if (a.status === "draft") return 1;
+      if (b.status === "draft") return -1;
+    }
+    const av = visibleVotes.get(a.id)?.count ?? 0;
+    const bv = visibleVotes.get(b.id)?.count ?? 0;
+    return bv - av;
+  });
+
   const earliest = earliestArrive(visible);
   const countdown = earliest ? daysUntil(earliest) : null;
 
